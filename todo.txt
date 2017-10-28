@@ -1,21 +1,10 @@
-* webpack config to TS
-* Use CleanWebpackPlugin
-* Use HtmlWebpackPlugin
-
-* Split lodash and react to a separate bundle
-** See Caching
+* Hot module reload
+* Lint for TS and JSX and stylus
 
 * Production setup
+** No map files in production
 
-* Hot module reload
 * Redux
-* Separate style files
-** Stylus
-* Bundle react and react-dom into separate js file
-* Pug for JSX
-
-* Lint for TS and JSX
+* Pug for JSX?
 * Some test framework
 * Uglify
-* How to edit properties and state from browser's console?
-* No map files in production
