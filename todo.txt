@@ -1,6 +1,3 @@
-* Hot module reload
-* Lint for TS and JSX and stylus
-
 * Production setup
 ** No map files in production
 

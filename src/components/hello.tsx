@@ -1,14 +1,16 @@
 import * as React from "react";
 import * as css from "./hello.styl";
 
-export interface HelloProps { compiler: string; framework: string; }
+import { World } from "./World";
 
-export class Hello extends React.Component<HelloProps, {}> {
-    render() {
-        console.log(css.hello);
+export interface IHelloProps { compiler: string; framework: string; }
+
+export class Hello extends React.Component<IHelloProps, {}> {
+    public render() {
         return (
             <div className={css.hello}>
-                <h1>Hello from {this.props.compiler} and {this.props.framework}!</h1>
+                <h1>Hello2 from {this.props.compiler} and {this.props.framework}!</h1>
+                <World />
             </div>
         );
     }

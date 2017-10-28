@@ -16,6 +16,7 @@ const config: webpack.Configuration = {
     entry: {
         main: path.join(paths.SRC, 'index.tsx'),
         vendor: [
+            'react-hot-loader/patch',
             'lodash',
             'react',
             'react-dom'
@@ -23,7 +24,7 @@ const config: webpack.Configuration = {
     },
     output: {
         path: paths.DIST,
-        filename: '[name].[hash].js'
+        filename: '[name].js'
     }, 
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json", ".styl"]
@@ -31,17 +32,17 @@ const config: webpack.Configuration = {
     module: {
         rules: [
             { test: /\.styl$/, use: ['style-loader', 'typings-for-css-modules-loader?modules&namedExport', 'stylus-loader'] },
-            { test: /\.tsx?$/, use: ['awesome-typescript-loader'] },
-            { enforce: "pre", test: /\.js$/, use: "source-map-loader" }
+            { test: /\.tsx?$/, use: ['react-hot-loader/webpack', 'awesome-typescript-loader'] },
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
+            { enforce: "pre", test: /\.tsx?$/, loader: "tslint-loader" }
         ]
     },
     plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
         new HtmlWebpackPlugin({ title: 'Rainfeeds' }),
-        new webpack.HashedModuleIdsPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
         new webpack.optimize.CommonsChunkPlugin({ name: 'vendor' }),
         new webpack.optimize.CommonsChunkPlugin({ name: 'runtime' })
-        
     ],
     devtool: "source-map",
     devServer: {
