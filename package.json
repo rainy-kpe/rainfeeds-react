@@ -1,0 +1,25 @@
+{
+    "name": "rainfeeds-react",
+    "dependencies": {
+        "@types/react": "^16.0.18",
+        "@types/react-dom": "^16.0.2",
+        "react": "^16.0.0",
+        "react-dom": "^16.0.0"
+    },
+    "devDependencies": {
+        "awesome-typescript-loader": "^3.2.3",
+        "css-loader": "^0.28.7",
+        "source-map-loader": "^0.2.3",
+        "style-loader": "^0.19.0",
+        "stylus": "^0.54.5",
+        "stylus-loader": "^3.0.1",
+        "typescript": "^2.5.3",
+        "webpack": "^3.8.1",
+        "webpack-dev-server": "^2.9.3"
+    },
+    "scripts": {
+        "build": "webpack",
+        "prod": "webpack -p",
+        "dev": "webpack-dev-server --progress --inline --hot"
+    }
+}
