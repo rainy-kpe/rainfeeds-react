@@ -3,6 +3,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as hot from "react-hot-loader";
 
+import * as bg from "./bg.jpg";
+import * as css from "./index.styl";
+
 import { Hello } from "./components/Hello";
 import { World } from "./components/World";
 
@@ -13,6 +16,7 @@ function rootElement() {
 }
 
 document.body.appendChild(rootElement());
+document.body.className = css.bg
 
 const App = <div>
         <Hello compiler="TypeScript" framework="React" />
