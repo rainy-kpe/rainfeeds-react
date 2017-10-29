@@ -40,7 +40,7 @@ const config: webpack.Configuration = {
     },
     plugins: [
         new CleanWebpackPlugin([ "dist" ]),
-        new HtmlWebpackPlugin({ title: "Rainfeeds" }),
+        new HtmlWebpackPlugin({ title: "Rainfeeds", template: "./src/template-index.html" }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.optimize.CommonsChunkPlugin({ name: "vendor" }),
         new webpack.optimize.CommonsChunkPlugin({ name: "runtime" })

@@ -3,12 +3,12 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as hot from "react-hot-loader";
 
-import * as bg from "./bg.jpg";
-import * as css from "./index.styl";
+import * as bg from "./images/bg.jpg";
+import * as style from "./styles/index.styl";
 
-import { Hello } from "./components/Hello";
-import { World } from "./components/World";
+import { Rainfeeds } from "./containers/rainfeeds/rainfeeds";
 
+// Add the root div to the body
 function rootElement() {
     const element = document.createElement("div");
     element.id = "root";
@@ -16,20 +16,12 @@ function rootElement() {
 }
 
 document.body.appendChild(rootElement());
-document.body.className = css.bg
-
-const App = <div>
-        <Hello compiler="TypeScript" framework="React" />
-        <World />
-    </div>;
+document.body.className = style.bg;
 
 const render = () => {
     ReactDOM.render(
         <hot.AppContainer>
-            <div>
-                <Hello compiler="TypeScript" framework="React" />
-                <World />
-            </div>
+            <Rainfeeds />
         </hot.AppContainer>,
         document.getElementById("root"),
     );
@@ -39,5 +31,5 @@ render();
 
 // Webpack Hot Module Replacement API
 if ((module as any).hot) {
-    (module as any).hot.accept("./components/Hello", () => { render(); });
+    (module as any).hot.accept("./containers/rainfeeds/rainfeeds", () => { render(); });
 }
