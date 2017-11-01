@@ -5,3 +5,11 @@
 * Pug for JSX?
 * Some test framework
 * Uglify
+
+
+
+* react-actions
+* react-thunk
+* async/await
+
+* Move loaders to vendor chunk

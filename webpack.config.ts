@@ -25,7 +25,7 @@ const config: webpack.Configuration = {
     output: {
         path: paths.DIST,
         filename: "[name].js"
-    }, 
+    },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json", ".styl"]
     },
