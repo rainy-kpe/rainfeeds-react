@@ -1,8 +1,13 @@
 import { combineReducers } from "redux";
 
+import * as store from "./store";
+import * as actions from "./actions";
+import * as rainfeeds from "./containers/rainfeeds/rainfeeds";
+
 // TODO: Types for state and action
 // TODO: Initial state handling
-const incr = (state: any, action: any) => {
+export const incrReducer = (state: rainfeeds.IRainfeedsState, action: actions.ActionTypes) => {
+    console.log("state:", state);
     switch (action.type) {
         case "INCREMENT_COUNTER":
             return { counter: (state ? state.counter : 0)  + action.amount };
@@ -12,5 +17,5 @@ const incr = (state: any, action: any) => {
 };
 
 export const reducers = combineReducers({
-    incr
+    rainfeeds: incrReducer
 });

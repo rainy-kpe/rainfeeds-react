@@ -1,9 +1,15 @@
-export interface IAction {
-    type: string;
+export type ActionTypes = IIncrementAction | IOtherAction;
+
+export interface IIncrementAction {
+    type: "INCREMENT_COUNTER";
     amount: number;
 }
 
-export const incrementCounter = (amount: number): IAction => ({
+export interface IOtherAction {
+    type: "OTHER_ACTION";
+}
+
+export const incrementCounter = (amount: number): IIncrementAction => ({
     type: "INCREMENT_COUNTER",
     amount
 });

@@ -1,5 +1,10 @@
 import { createStore } from "redux";
 
-import { reducers } from "./reducers";
+import * as reducers from "./reducers";
+import * as rainfeeds from "./containers/rainfeeds/rainfeeds";
 
-export const store = createStore(reducers);
+export const store = createStore(reducers.reducers, {});
+
+export interface IStoreState {
+    rainfeeds: rainfeeds.IRainfeedsState;
+}

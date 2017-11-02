@@ -1,44 +1,40 @@
 import * as React from "react";
 import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import { Button } from "semantic-ui-react";
 
 import { Header } from "../../components/header/header";
 import { FeedCard } from "../../containers/feed-card/feed-card";
 import * as style from "./rainfeeds.styl";
 import * as actions from "../../actions";
+import * as store from "../../store";
 
-interface IRainfeedsProps {
-    url?: string;
-}
-
-interface IState {
+export interface IRainfeedsState {
     counter: number;
 }
 
-class RainfeedsImpl extends React.Component<IRainfeedsProps, IState> {
-    public state: IState = {
-        counter: 0
-    };
+interface IRainfeedsProps {
+    counter: number;
+}
 
-    // TODO: Is state type correct?
-    constructor(props: IRainfeedsProps, context: IState) {
-        super(props, context);
-    }
+interface IRainfeedsDispatch {
+    incr: () => actions.IIncrementAction;
+    decr: () => actions.IIncrementAction;
+}
 
+class RainfeedsComponent extends React.Component<IRainfeedsProps & IRainfeedsDispatch> {
     public render() {
-        const { url } = this.props;
-
         console.log(this.props);
         console.log(this.state);
 
         return (
             <div>
                 <Header application="Rainfeeds 2.0" />
-                Counter: {this.state.counter}<br />
-                <Button onClick={(this.props as any).incr()}>
+                Counter: {this.props.counter}<br />
+                <Button onClick={() => this.props.incr()}>
                     Increment
                 </Button>
-                <Button onClick={(this.props as any).decr()}>
+                <Button onClick={() => this.props.decr()}>
                     Decrement
                 </Button>
             </div>
@@ -46,15 +42,19 @@ class RainfeedsImpl extends React.Component<IRainfeedsProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IState) => state;
+const mapStateToProps = (state: store.IStoreState): IRainfeedsProps => {
+    console.log(state);
+    return {
+        counter: state.rainfeeds.counter
+    };
+};
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: Dispatch<actions.IIncrementAction>): IRainfeedsDispatch => ({
     decr: () => dispatch(actions.incrementCounter(-1)),
     incr: () => dispatch(actions.incrementCounter(1))
 });
 
-// TODO: Fix the type
-export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsImpl as any);
+export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsComponent);
 
 /*
                 <div className={ style.items }>
@@ -66,6 +66,4 @@ export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsI
                         )
                     }
                 </div>
-
-
 */
