@@ -1,0 +1,25 @@
+.items
+  display: flex
+  flex-wrap: wrap
+  margin: 0 2rem
+
+  .item
+    flex: 1 0 25rem
+    box-sizing: border-box
+    margin: 1rem
+
+@media (min-width: 48em)
+  .items .item
+    max-width: calc(50% - 2em)
+
+@media (min-width: 73em)
+  .items .item
+    max-width: calc(33.33333% - 2em)
+
+@media (min-width: 98em)
+  .items .item
+    max-width: calc(25% - 2em)
+
+@media (min-width: 123em)
+  .items .item
+    max-width: calc(20% - 2em)

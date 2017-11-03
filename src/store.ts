@@ -1,10 +1,16 @@
-import { createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
+import { logger } from "redux-logger";
 
-import * as reducers from "./reducers";
-import * as rainfeeds from "./containers/rainfeeds/rainfeeds";
+import { reducers } from "./reducers";
+import { ICounterState } from "./containers/counter/counter";
+import { ICardState } from "./containers/rainfeeds/rainfeeds";
 
-export const store = createStore(reducers.reducers, {});
+export const store = createStore(
+    reducers,
+    applyMiddleware(logger)
+);
 
 export interface IStoreState {
-    rainfeeds: rainfeeds.IRainfeedsState;
+    counterState: ICounterState;
+    cardState: ICardState;
 }

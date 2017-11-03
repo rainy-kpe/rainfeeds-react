@@ -1,69 +1,84 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Button } from "semantic-ui-react";
+import { Button, Modal, Input } from "semantic-ui-react";
 
 import { Header } from "../../components/header/header";
 import { FeedCard } from "../../containers/feed-card/feed-card";
+import { Counter } from "../../containers/counter/counter";
 import * as style from "./rainfeeds.styl";
 import * as actions from "../../actions";
 import * as store from "../../store";
 
-export interface IRainfeedsState {
-    counter: number;
-}
-
-interface IRainfeedsProps {
-    counter: number;
+export interface ICardState {
+    cards: string[];
+    showAskDialog: boolean;
 }
 
 interface IRainfeedsDispatch {
-    incr: () => actions.IIncrementAction;
-    decr: () => actions.IIncrementAction;
+    hideAskCardName: () => actions.ICardAction;
+    addCard: (title: string) => actions.ICardAction;
 }
 
-class RainfeedsComponent extends React.Component<IRainfeedsProps & IRainfeedsDispatch> {
-    public render() {
-        console.log(this.props);
-        console.log(this.state);
+class RainfeedsComponent extends React.Component<ICardState & IRainfeedsDispatch> {
+    private text: string = "";
 
+    public render() {
         return (
             <div>
                 <Header application="Rainfeeds 2.0" />
-                Counter: {this.props.counter}<br />
-                <Button onClick={() => this.props.incr()}>
-                    Increment
-                </Button>
-                <Button onClick={() => this.props.decr()}>
-                    Decrement
-                </Button>
-            </div>
-        );
-    }
-}
 
-const mapStateToProps = (state: store.IStoreState): IRainfeedsProps => {
-    console.log(state);
-    return {
-        counter: state.rainfeeds.counter
-    };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<actions.IIncrementAction>): IRainfeedsDispatch => ({
-    decr: () => dispatch(actions.incrementCounter(-1)),
-    incr: () => dispatch(actions.incrementCounter(1))
-});
-
-export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsComponent);
-
-/*
                 <div className={ style.items }>
                     {
-                        [...Array(1)].map((card: any) => (
-                            <div className={ style.item }>
-                                <FeedCard title="Hello World" />
+                        this.props.cards.map((title: string, i: number) => (
+                            <div className={style.item} key={i}>
+                                <FeedCard title={title} />
                             </div>)
                         )
                     }
                 </div>
-*/
+
+                <Modal dimmer="blurring"
+                    size="mini"
+                    open={this.props.showAskDialog}
+                    onClose={this.props.hideAskCardName}>
+
+                    <Modal.Header>Give name for the card</Modal.Header>
+                    <Modal.Content>
+                        <Input onChange={this.onChange} fluid placeholder="Card name" />
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button positive icon="checkmark" labelPosition="right" content="Add card"
+                            onClick={this.onClose} />
+                    </Modal.Actions>
+                </Modal>
+
+                <Counter />
+            </div>
+        );
+    }
+
+    private onClose = (e: React.SyntheticEvent<HTMLElement>) => {
+        this.props.hideAskCardName();
+        this.props.addCard(this.text);
+    }
+
+    private onChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
+        this.text = (e.target as any).value;
+    }
+}
+
+const mapStateToProps = (state: store.IStoreState): ICardState => {
+    console.log("state", state);
+    return {
+        cards: state.cardState.cards,
+        showAskDialog: state.cardState.showAskDialog
+    };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch<actions.IIncrementAction>): IRainfeedsDispatch => ({
+    hideAskCardName: () => dispatch(actions.hideAskCardName()),
+    addCard: (title: string) => dispatch(actions.addCard(title))
+});
+
+export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsComponent);
