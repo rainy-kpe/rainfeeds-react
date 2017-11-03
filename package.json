@@ -8,6 +8,7 @@
         "react-redux": "^5.0.6",
         "redux": "^3.7.2",
         "redux-logger": "^3.0.6",
+        "redux-thunk": "^2.2.0",
         "semantic-ui-react": "^0.75.1"
     },
     "devDependencies": {
@@ -17,6 +18,7 @@
         "@types/react-dom": "^16.0.2",
         "@types/react-hot-loader": "^3.0.5",
         "@types/redux-logger": "^3.0.5",
+        "@types/redux-thunk": "^2.1.0",
         "@types/webpack": "^3.0.14",
         "awesome-typescript-loader": "^3.2.3",
         "clean-webpack-plugin": "^0.1.17",

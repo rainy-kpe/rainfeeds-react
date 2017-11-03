@@ -5,6 +5,7 @@ import * as store from "./store";
 import * as actions from "./actions";
 import { ICounterState } from "./containers/counter/counter";
 import { ICardState } from "./containers/rainfeeds/rainfeeds";
+import { IFeedState } from "./containers/feed-card/feed-card";
 
 const initialState: ICounterState = {
     counter: 0
@@ -20,7 +21,7 @@ const counterReducer = (state: ICounterState = initialState, action: actions.IIn
 };
 
 const initialCardState: ICardState = {
-    cards: ["Hello", "World"],
+    cards: ["Hello"],
     showAskDialog: false
 };
 
@@ -39,8 +40,27 @@ const cardReducer = (state: ICardState = initialCardState, action: actions.ICard
     }
 };
 
+const initialFeedState: IFeedState = {
+    feed: {},
+    fetching: false
+};
+
+const feedReducer = (state: IFeedState = initialFeedState, action: actions.IFeedAction) => {
+    switch (action.type) {
+        case "FEED_REQUEST":
+            return { ...state, fetching: true };
+        case "FEED_FAILURE":
+            return { ...state, fetching: false };
+        case "FEED_SUCCESS":
+            return { ...state, fetching: false, feed: action.response };
+        default:
+            return state;
+    }
+};
+
 // TODO: Match this type with the store
 export const reducers = combineReducers({
     counterState: counterReducer,
-    cardState: cardReducer
+    cardState: cardReducer,
+    feedState: feedReducer
 });

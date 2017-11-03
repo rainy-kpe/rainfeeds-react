@@ -1,22 +1,13 @@
 * Production setup
 ** No map files in production
 
-* Redux
 * Pug for JSX?
 * Some test framework
 * Uglify
 
-
-
 * react-actions
-* react-thunk
-* async/await
-
 * Move loaders to vendor chunk
-
 * Persist state between refreshes
-
-
 * Center header text in cards
 
 * Add card:

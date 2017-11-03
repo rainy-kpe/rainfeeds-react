@@ -19,6 +19,11 @@ export interface ICardDispatch {
     removeCard: (title: string) => actions.ICardAction;
 }
 
+export interface IFeedState {
+    feed: any;
+    fetching: boolean;
+}
+
 class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> {
     private items: any[] = [];
 
@@ -26,6 +31,17 @@ class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> 
         super();
 
         this.items = [...Array(7)];
+    }
+
+    public componentDidMount() {
+        // const url = "http://www.rainlendar.net/cms/index.php?option=com_kunena&Itemid=42&func=fb_rss&no_html=1";
+        // const url = "http://www.reddit.com/.rss";
+        const url = "https://query.yahooapis.com/v1/public/yql" +
+            "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
+            "url=%22http%3A%2F%2Fwww.rainlendar.net%2Fcms%2Findex.php%3Foption%3Dcom_kunena%26Itemid" +
+            "%3D42%26func%3Dfb_rss%26no_html%3D1%22%20and%20output=%22atom_1.0%22";
+
+        store.store.dispatch(actions.fetchFeed(url));
     }
 
     public render() {
