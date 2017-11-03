@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 import { Button, Modal, Input } from "semantic-ui-react";
 
 import { Header } from "../../components/header/header";
-import { FeedCard } from "../../containers/feed-card/feed-card";
+import * as feedcard from "../../containers/feed-card/feed-card";
 import { Counter } from "../../containers/counter/counter";
 import * as style from "./rainfeeds.styl";
 import * as actions from "../../actions";
@@ -15,12 +15,7 @@ export interface ICardState {
     showAskDialog: boolean;
 }
 
-interface IRainfeedsDispatch {
-    hideAskCardName: () => actions.ICardAction;
-    addCard: (title: string) => actions.ICardAction;
-}
-
-class RainfeedsComponent extends React.Component<ICardState & IRainfeedsDispatch> {
+class RainfeedsComponent extends React.Component<ICardState & feedcard.ICardDispatch> {
     private text: string = "";
 
     public render() {
@@ -32,7 +27,7 @@ class RainfeedsComponent extends React.Component<ICardState & IRainfeedsDispatch
                     {
                         this.props.cards.map((title: string, i: number) => (
                             <div className={style.item} key={i}>
-                                <FeedCard title={title} />
+                                <feedcard.FeedCard title={title} />
                             </div>)
                         )
                     }
@@ -68,17 +63,9 @@ class RainfeedsComponent extends React.Component<ICardState & IRainfeedsDispatch
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): ICardState => {
-    console.log("state", state);
-    return {
-        cards: state.cardState.cards,
-        showAskDialog: state.cardState.showAskDialog
-    };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<actions.IIncrementAction>): IRainfeedsDispatch => ({
-    hideAskCardName: () => dispatch(actions.hideAskCardName()),
-    addCard: (title: string) => dispatch(actions.addCard(title))
+const mapStateToProps = (state: store.IStoreState): ICardState => ({
+    cards: state.cardState.cards,
+    showAskDialog: state.cardState.showAskDialog
 });
 
-export const Rainfeeds = connect(mapStateToProps, mapDispatchToProps)(RainfeedsComponent);
+export const Rainfeeds = connect(mapStateToProps, feedcard.mapDispatchToProps)(RainfeedsComponent);

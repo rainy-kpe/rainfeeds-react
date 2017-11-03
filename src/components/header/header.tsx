@@ -6,17 +6,14 @@ import { Dispatch } from "redux";
 import * as style from "./header.styl";
 import * as actions from "../../actions";
 import * as store from "../../store";
+import * as feedcard from "../../containers/feed-card/feed-card";
 import { ICardState } from "../../containers/rainfeeds/rainfeeds";
 
 export interface IHeaderProps {
     application: string;
 }
 
-interface ICardDispatch {
-    askCardName: () => actions.ICardAction;
-}
-
-class HeaderComponent extends React.Component<IHeaderProps & ICardState & ICardDispatch> {
+class HeaderComponent extends React.Component<IHeaderProps & ICardState & feedcard.ICardDispatch> {
     public render() {
         return (<div className={style.header}>
             <div id={style.top}>
@@ -33,15 +30,9 @@ class HeaderComponent extends React.Component<IHeaderProps & ICardState & ICardD
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): ICardState => {
-    return {
-        cards: state.cardState.cards,
-        showAskDialog: state.cardState.showAskDialog
-    };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<actions.ICardAction>): ICardDispatch => ({
-    askCardName: () => dispatch(actions.askCardName())
+const mapStateToProps = (state: store.IStoreState): ICardState => ({
+    cards: state.cardState.cards,
+    showAskDialog: state.cardState.showAskDialog
 });
 
-export const Header = connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
+export const Header = connect(mapStateToProps, feedcard.mapDispatchToProps)(HeaderComponent);

@@ -12,11 +12,14 @@ export interface IFeedCardProps {
     title: string;
 }
 
-interface IFeedCardDispatch {
+export interface ICardDispatch {
+    askCardName: () => actions.ICardAction;
+    hideAskCardName: () => actions.ICardAction;
+    addCard: (title: string) => actions.ICardAction;
     removeCard: (title: string) => actions.ICardAction;
 }
 
-class FeedCardComponent extends React.Component<IFeedCardProps & IFeedCardDispatch> {
+class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> {
     private items: any[] = [];
 
     constructor() {
@@ -40,8 +43,8 @@ class FeedCardComponent extends React.Component<IFeedCardProps & IFeedCardDispat
                             header="Delete card?"
                             content={`Are you sure you want to delete the card: '${title}'?`}
                             actions={[
-                              "Cancel",
-                              { key: "done", content: "Delete", positive: true, onClick: this.onRemove },
+                                "Cancel",
+                                { key: "done", content: "Delete", positive: true, onClick: this.onRemove }
                             ]} />
                     </Card.Header>
                 </Card.Content>
@@ -70,18 +73,15 @@ class FeedCardComponent extends React.Component<IFeedCardProps & IFeedCardDispat
     }
 
     private onRemove = (e: React.SyntheticEvent<HTMLElement>) => {
-        console.log(this.props);
         this.props.removeCard(this.props.title);
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): {} => {
-    return {
-    };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<actions.ICardAction>): IFeedCardDispatch => ({
+export const mapDispatchToProps = (dispatch: Dispatch<actions.ICardAction>): ICardDispatch => ({
+    askCardName: () => dispatch(actions.askCardName()),
+    hideAskCardName: () => dispatch(actions.hideAskCardName()),
+    addCard: (title: string) => dispatch(actions.addCard(title)),
     removeCard: (title: string) => dispatch(actions.removeCard(title))
 });
 
-export const FeedCard = connect(mapStateToProps, mapDispatchToProps)(FeedCardComponent);
+export const FeedCard = connect(undefined, mapDispatchToProps)(FeedCardComponent);
