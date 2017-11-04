@@ -17,9 +17,16 @@ const config: webpack.Configuration = {
         main: path.join(paths.SRC, "index.tsx"),
         vendor: [
             "react-hot-loader/patch",
+            "react-hot-loader",
             "lodash",
+            "lodash-es",
             "react",
-            "react-dom"
+            "react-dom",
+            "react-redux",
+            "redux",
+            "redux-logger",
+            "redux-thunk",
+            "semantic-ui-react"
         ]
     },
     output: {
