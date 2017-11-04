@@ -4,16 +4,15 @@ import * as UI from "semantic-ui-react";
 import { Dispatch } from "redux";
 
 import * as style from "./header.styl";
-import * as actions from "../../actions";
-import * as store from "../../store";
 import * as feedcard from "../../containers/feed-card/feed-card";
-import { ICardState } from "../../containers/rainfeeds/rainfeeds";
+import { IStoreState } from "../../store";
+import * as actions from "../../actions/cardActions";
 
 export interface IHeaderProps {
     application: string;
 }
 
-class HeaderComponent extends React.Component<IHeaderProps & ICardState & feedcard.ICardDispatch> {
+class HeaderComponent extends React.Component<IHeaderProps & actions.ICardState & actions.ICardDispatch> {
     public render() {
         return (<div className={style.header}>
             <div id={style.top}>
@@ -30,9 +29,9 @@ class HeaderComponent extends React.Component<IHeaderProps & ICardState & feedca
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): ICardState => ({
+const mapStateToProps = (state: IStoreState): actions.ICardState => ({
     cards: state.cardState.cards,
     showAskDialog: state.cardState.showAskDialog
 });
 
-export const Header = connect(mapStateToProps, feedcard.mapDispatchToProps)(HeaderComponent);
+export const Header = connect(mapStateToProps, actions.mapDispatchToProps)(HeaderComponent);

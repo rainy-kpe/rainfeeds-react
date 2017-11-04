@@ -5,26 +5,15 @@ import { Modal, Button, Header, Card, Item } from "semantic-ui-react";
 
 import * as style from "./feed-card.styl";
 import * as image from "./image.png";
-import * as actions from "../../actions";
+import * as actions from "../../actions/cardActions";
+import * as feedActions from "../../actions/feedActions";
 import * as store from "../../store";
 
 export interface IFeedCardProps {
     title: string;
 }
 
-export interface ICardDispatch {
-    askCardName: () => actions.ICardAction;
-    hideAskCardName: () => actions.ICardAction;
-    addCard: (title: string) => actions.ICardAction;
-    removeCard: (title: string) => actions.ICardAction;
-}
-
-export interface IFeedState {
-    feed: any;
-    fetching: boolean;
-}
-
-class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> {
+class FeedCardComponent extends React.Component<IFeedCardProps & actions.ICardDispatch> {
     private items: any[] = [];
 
     constructor() {
@@ -41,7 +30,7 @@ class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> 
             "url=%22http%3A%2F%2Fwww.rainlendar.net%2Fcms%2Findex.php%3Foption%3Dcom_kunena%26Itemid" +
             "%3D42%26func%3Dfb_rss%26no_html%3D1%22%20and%20output=%22atom_1.0%22";
 
-        store.store.dispatch(actions.fetchFeed(url));
+        store.store.dispatch(feedActions.fetchFeed(url));
     }
 
     public render() {
@@ -93,11 +82,4 @@ class FeedCardComponent extends React.Component<IFeedCardProps & ICardDispatch> 
     }
 }
 
-export const mapDispatchToProps = (dispatch: Dispatch<actions.ICardAction>): ICardDispatch => ({
-    askCardName: () => dispatch(actions.askCardName()),
-    hideAskCardName: () => dispatch(actions.hideAskCardName()),
-    addCard: (title: string) => dispatch(actions.addCard(title)),
-    removeCard: (title: string) => dispatch(actions.removeCard(title))
-});
-
-export const FeedCard = connect(undefined, mapDispatchToProps)(FeedCardComponent);
+export const FeedCard = connect(undefined, actions.mapDispatchToProps)(FeedCardComponent);

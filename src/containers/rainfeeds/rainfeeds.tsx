@@ -3,19 +3,14 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Button, Modal, Input } from "semantic-ui-react";
 
-import { Header } from "../../components/header/header";
-import * as feedcard from "../../containers/feed-card/feed-card";
+import { Header } from "../../containers/header/header";
+import { FeedCard } from "../../containers/feed-card/feed-card";
 import { Counter } from "../../containers/counter/counter";
 import * as style from "./rainfeeds.styl";
-import * as actions from "../../actions";
+import * as actions from "../../actions/cardActions";
 import * as store from "../../store";
 
-export interface ICardState {
-    cards: string[];
-    showAskDialog: boolean;
-}
-
-class RainfeedsComponent extends React.Component<ICardState & feedcard.ICardDispatch> {
+class RainfeedsComponent extends React.Component<actions.ICardState & actions.ICardDispatch> {
     private text: string = "";
 
     public render() {
@@ -27,7 +22,7 @@ class RainfeedsComponent extends React.Component<ICardState & feedcard.ICardDisp
                     {
                         this.props.cards.map((title: string, i: number) => (
                             <div className={style.item} key={i}>
-                                <feedcard.FeedCard title={title} />
+                                <FeedCard title={title} />
                             </div>)
                         )
                     }
@@ -63,9 +58,9 @@ class RainfeedsComponent extends React.Component<ICardState & feedcard.ICardDisp
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): ICardState => ({
+const mapStateToProps = (state: store.IStoreState): actions.ICardState => ({
     cards: state.cardState.cards,
     showAskDialog: state.cardState.showAskDialog
 });
 
-export const Rainfeeds = connect(mapStateToProps, feedcard.mapDispatchToProps)(RainfeedsComponent);
+export const Rainfeeds = connect(mapStateToProps, actions.mapDispatchToProps)(RainfeedsComponent);

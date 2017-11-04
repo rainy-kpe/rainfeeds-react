@@ -4,12 +4,9 @@ import { Dispatch } from "redux";
 import { Button } from "semantic-ui-react";
 
 import * as style from "./counter.styl";
-import * as actions from "../../actions";
+import * as actions from "../../actions/counterActions";
 import * as store from "../../store";
-
-export interface ICounterState {
-    counter: number;
-}
+import { ICounterState } from "../../actions/counterActions";
 
 interface ICounterDispatch {
     incr: () => actions.IIncrementAction;
@@ -35,12 +32,9 @@ class CounterComponent extends React.Component<ICounterState & ICounterDispatch>
     }
 }
 
-const mapStateToProps = (state: store.IStoreState): ICounterState => {
-    console.log(state);
-    return {
-        counter: state.counterState.counter
-    };
-};
+const mapStateToProps = (state: store.IStoreState): ICounterState => ({
+    counter: state.counterState.counter
+});
 
 const mapDispatchToProps = (dispatch: Dispatch<actions.IIncrementAction>): ICounterDispatch => ({
     decr: () => dispatch(actions.incrementCounter(-1)),
