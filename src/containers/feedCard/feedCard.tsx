@@ -1,19 +1,20 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Modal, Button, Header, Card, Item } from "semantic-ui-react";
+import { Dropdown, Modal, Button, Header, Card, Item } from "semantic-ui-react";
 
-import * as style from "./feed-card.styl";
+import * as style from "./feedCard.styl";
 import * as image from "./image.png";
 import * as actions from "../../actions/cardActions";
 import * as feedActions from "../../actions/feedActions";
 import * as store from "../../store";
+import {Settings} from "../settings/settings";
 
 export interface IFeedCardProps {
     title: string;
 }
 
-class FeedCardComponent extends React.Component<IFeedCardProps & actions.ICardDispatch> {
+class FeedCardComponent extends React.Component<IFeedCardProps & actions.ICardDispatch & actions.ICardState> {
     private items: any[] = [];
 
     constructor() {
@@ -41,16 +42,13 @@ class FeedCardComponent extends React.Component<IFeedCardProps & actions.ICardDi
                 <Card.Content>
                     <Card.Header className={style.header}>
                         { title }
-                        <Modal
-                            dimmer="blurring"
-                            size="mini"
-                            trigger={<Button icon="remove" size="mini" />}
-                            header="Delete card?"
-                            content={`Are you sure you want to delete the card: '${title}'?`}
-                            actions={[
-                                "Cancel",
-                                { key: "done", content: "Delete", positive: true, onClick: this.onRemove }
-                            ]} />
+                        <Dropdown icon="ellipsis vertical">
+                            <Dropdown.Menu>
+                                <Dropdown.Item text="Configure" icon="setting" onClick={this.onConfig}/>
+                                <Dropdown.Divider />
+                                <Dropdown.Item text="Delete card" icon="remove" onClick={this.onConfirmDelete}/>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </Card.Header>
                 </Card.Content>
                 <Card.Content className={ style.content }>
@@ -73,13 +71,36 @@ class FeedCardComponent extends React.Component<IFeedCardProps & actions.ICardDi
                         }
                     </Item.Group>
                 </Card.Content>
+
+                <Modal
+                    onClose={() => this.props.toggleDeleteConfirmation(false)}
+                    dimmer="blurring"
+                    size="mini"
+                    open={this.props.showDeleteConfirmationDialog}
+                    header="Delete card?"
+                    content={`Are you sure you want to delete the card: '${title}'?`}
+                    actions={[
+                        "Cancel",
+                        { key: "done", content: "Delete", positive: true, onClick: this.onRemove }
+                    ]} />
+
+                <Settings open={this.props.showSettings} cardName={title} />
             </Card>
         );
     }
 
+    private onConfirmDelete = (e: React.SyntheticEvent<HTMLElement>) => {
+        this.props.toggleDeleteConfirmation(true);
+    }
+
     private onRemove = (e: React.SyntheticEvent<HTMLElement>) => {
+        this.props.toggleDeleteConfirmation(false);
         this.props.removeCard(this.props.title);
+    }
+
+    private onConfig = (e: React.SyntheticEvent<HTMLElement>) => {
+        this.props.toggleSettings(true);
     }
 }
 
-export const FeedCard = connect(undefined, actions.mapDispatchToProps)(FeedCardComponent);
+export const FeedCard = connect(actions.mapStateToProps, actions.mapDispatchToProps)(FeedCardComponent);
