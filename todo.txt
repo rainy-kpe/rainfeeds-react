@@ -12,9 +12,6 @@
 ** Don't allow duplicate names
 ** Focus the input when dialog is shown
 
-
-* Support for HackerNews
-
 * Login
 * Logout
 * Read feeds from the firebase

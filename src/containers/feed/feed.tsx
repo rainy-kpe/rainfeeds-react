@@ -48,7 +48,7 @@ class FeedComponent extends React.Component<IFeedProps & IFeedState> {
     }
 
     private renderHeading(item: actions.IFeedEntry) {
-        return<Popup size="large" trigger={
+        return<Popup wide trigger={
                 <Item.Header as="a" target="_blank" href={item.link} content={item.title} />
             }>
             <div>{item.title}</div>

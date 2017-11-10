@@ -69,13 +69,19 @@ export const toggleSettings = (title: string): ICardAction => ({
 
 const initialState: ICardState = {
     cards: [
-        { type: "rss", title: "Reddit", updateRate: 15, urls: ["http://www.reddit.com/.rss"]},
+        { type: "rss", title: "Reddit", updateRate: 15, urls: [
+            "http://www.reddit.com/.rss"
+        ]},
         { type: "hackernews", title: "Hacker News", updateRate: 30 },
         { type: "rss", title: "Rainlendar", updateRate: 60, urls: [
             "http://www.rainlendar.net/cms/index.php?option=com_kunena&Itemid=42&func=fb_rss&no_html=1"]
         },
-        { type: "rss", title: "Tivi", updateRate: 60, urls: ["http://www.tivi.fi/rss.xml"]},
-        { type: "rss", title: "Afterdawn", updateRate: 30, urls: ["http://feeds.afterdawn.com/afterdawn_uutiset"]},
+        { type: "rss", title: "Tivi", updateRate: 60, urls: [
+            "http://www.tivi.fi/rss.xml"
+        ]},
+        { type: "rss", title: "Afterdawn", updateRate: 30, urls: [
+            "http://feeds.afterdawn.com/afterdawn_uutiset"
+        ]},
         { type: "rss", title: "Aamulehti", updateRate: 60, urls: [
             "http://www.aamulehti.fi/?feed=uutiset&o=RSS%20-%20Ihmiset&k=0&ma=0&c=6",
             "http://www.aamulehti.fi/?feed=uutiset&o=RSS%20-%20Kotimaa&k=0&ma=0&c=2",
@@ -83,14 +89,18 @@ const initialState: ICardState = {
             "http://www.aamulehti.fi/?feed=uutiset&o=RSS%20-%20Maailma&k=0&ma=0&c=4",
             "http://www.aamulehti.fi/?feed=uutiset&o=RSS%20-%20Raha&k=0&ma=0&c=3"
         ]},
-        { type: "rss", title: "Iltalehti", updateRate: 30, urls: ["http://www.iltalehti.fi/osastot/rss2-osastot-short20_os.xml"]},
+        { type: "rss", title: "Iltalehti", updateRate: 30, urls: [
+            "http://www.iltalehti.fi/osastot/rss2-osastot-short20_os.xml"
+        ]},
         { type: "rss", title: "Blogs", updateRate: 60, urls: [
             "http://blog.polymer-project.org/feed.xml",
             "https://blogs.msdn.microsoft.com/typescript/feed/",
             "https://javascriptweblog.wordpress.com/feed/",
             "http://feeds.feedburner.com/2ality"
         ]},
-        { type: "rss", title: "JS Newsletter", updateRate: 60, urls: ["http://javascriptweekly.com/rss/1gh1ef0b"] }
+        { type: "rss", title: "JS Newsletter", updateRate: 60, urls: [
+            "http://javascriptweekly.com/rss/1gh1ef0b"
+        ]}
     ],
     showSettings: null
 };

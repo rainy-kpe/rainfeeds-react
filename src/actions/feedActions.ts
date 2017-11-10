@@ -74,7 +74,6 @@ export const fetchHackerNews = (feedTitle: string) => {
 
             const fetches = _.range(0, 20).map(async (index) => {
                 if (!_.includes(oldItems, json[index])) {
-                    console.log(`Downloading hacker news item ${json[index]}`)
                     const item = await fetch(`https://hacker-news.firebaseio.com/v0/item/${json[index]}.json`);
                     return item.json();
                 } else {
@@ -85,15 +84,15 @@ export const fetchHackerNews = (feedTitle: string) => {
             const result = await Promise.all(fetches);
             console.log(feedTitle, result);
 
-            const entries = result.filter(entry => !!entry)
+            const entries = result.filter((entry) => !!entry)
                 .map((entry: any) => {
-                    return <IFeedEntry> {
+                    return {
                         title: entry.title,
                         summary: `Score: ${entry.score} by ${entry.by} | Comments: ${entry.descendants}`,
                         time: new Date(entry.time * 1000).toISOString(),
                         link: entry.url,
                         id: entry.id
-                    };
+                    } as IFeedEntry;
                 }).concat(state.feed ? state.feed.entries : []);
 
             dispatch(feedSuccess(feedTitle, {
@@ -134,14 +133,14 @@ export const fetchFeed = (feedTitle: string, url: string) => {
                         let image;
                         let imageLink;
                         if (entry.content) {
-                            if (_.isObject(entry.content)) {
-                                image = entry.content.url;
-                            } else {
+                            if (entry.content.content) {
                                 let re = entry.content.content.match(/img src=\"(.*?)\"/i);
                                 image = re && re.length > 1 ? re[1] : undefined;
 
                                 re = entry.content.content.match(/.*href=\"(.*?)\">\[link/i);
                                 imageLink = re && re.length > 1 ? re[1] : undefined;
+                            } else {
+                                image = entry.content.url;
                             }
                         }
 
@@ -157,7 +156,7 @@ export const fetchFeed = (feedTitle: string, url: string) => {
                             time: entry.updated,
                             image,
                             imageLink,
-                            link: entry.link.href
+                            link: _.isArray(entry.link) ? entry.link[0].href : entry.link.href
                         };
                     })
                 }
