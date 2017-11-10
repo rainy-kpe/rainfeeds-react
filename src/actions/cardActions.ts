@@ -7,27 +7,25 @@ import { IStoreState } from "../store";
 export interface ICard {
     title: string;
     urls: string[];
+    updateRate: number;
 }
 
 export interface ICardState {
     cards: ICard[];
-    showAskDialog: boolean;
-    showDeleteConfirmationDialog: boolean;
-    showSettings: boolean;
+    showSettings: string;
 }
 
 export interface ICardAction {
-    type: "ADD_CARD" | "REMOVE_CARD" | "TOGGLE_ASK_CARD_NAME" | "TOGGLE_DELETE_CONFIRMATION" | "TOGGLE_SETTINGS";
+    type: "ADD_CARD" | "REMOVE_CARD" | "UPDATE_CARD" | "TOGGLE_SETTINGS";
     title?: string;
-    show?: boolean;
+    card?: ICard;
 }
 
 export interface ICardDispatch {
     addCard: (title: string) => ICardAction;
     removeCard: (title: string) => ICardAction;
-    toggleAskCardName: (show: boolean) => ICardAction;
-    toggleDeleteConfirmation: (show: boolean) => ICardAction;
-    toggleSettings: (show: boolean) => ICardAction;
+    updateCard: (card: ICard) => ICardAction;
+    toggleSettings: (title: string) => ICardAction;
 }
 
 /* Property mappers */
@@ -35,15 +33,12 @@ export interface ICardDispatch {
 export const mapDispatchToProps = (dispatch: Dispatch<ICardAction>): ICardDispatch => ({
     addCard: (title: string) => dispatch(addCard(title)),
     removeCard: (title: string) => dispatch(removeCard(title)),
-    toggleAskCardName: (show: boolean) => dispatch(toggleAskCardName(show)),
-    toggleDeleteConfirmation: (show: boolean) => dispatch(toggleDeleteConfirmation(show)),
-    toggleSettings: (show: boolean) => dispatch(toggleSettings(show))
+    updateCard: (card: ICard) => dispatch(updateCard(card)),
+    toggleSettings: (title: string) => dispatch(toggleSettings(title))
 });
 
 export const mapStateToProps = (state: IStoreState): ICardState => ({
     cards: state.cardState.cards,
-    showAskDialog: state.cardState.showAskDialog,
-    showDeleteConfirmationDialog: state.cardState.showDeleteConfirmationDialog,
     showSettings: state.cardState.showSettings
 });
 
@@ -59,42 +54,45 @@ export const removeCard = (title: string): ICardAction => ({
     title
 });
 
-export const toggleAskCardName = (show: boolean): ICardAction => ({
-    type: "TOGGLE_ASK_CARD_NAME",
-    show
+export const updateCard = (card: ICard): ICardAction => ({
+    type: "UPDATE_CARD",
+    card
 });
 
-export const toggleDeleteConfirmation = (show: boolean): ICardAction => ({
-    type: "TOGGLE_DELETE_CONFIRMATION",
-    show
-});
-
-export const toggleSettings = (show: boolean): ICardAction => ({
+export const toggleSettings = (title: string): ICardAction => ({
     type: "TOGGLE_SETTINGS",
-    show
+    title
 });
 
 /* Reducer */
 
 const initialState: ICardState = {
-    cards: [{ title: "Test Feed", urls: []}],
-    showAskDialog: false,
-    showDeleteConfirmationDialog: false,
-    showSettings: false
+    cards: [
+        { title: "Reddit", updateRate: 15, urls: ["http://www.reddit.com/.rss"]},
+        { title: "Rainlendar", updateRate: 60, urls: [
+            "http://www.rainlendar.net/cms/index.php?option=com_kunena&Itemid=42&func=fb_rss&no_html=1"]
+        },
+        { title: "Blogs", updateRate: 60, urls: [
+            "http://blog.polymer-project.org/feed.xml",
+            "https://blogs.msdn.microsoft.com/typescript/feed/",
+            "https://javascriptweblog.wordpress.com/feed/",
+            "http://feeds.feedburner.com/2ality"
+        ]}
+    ],
+    showSettings: null
 };
 
 export const cardReducer = (state: ICardState = initialState, action: ICardAction) => {
     switch (action.type) {
         case "ADD_CARD":
-            return { ...state, cards: state.cards.concat({title: action.title, urls: []}) };
+            return { ...state, cards: state.cards.concat({title: action.title, urls: [], updateRate: 60}) };
         case "REMOVE_CARD":
             return { ...state, cards: _.filter(state.cards, (card) => card.title !== action.title) };
-        case "TOGGLE_ASK_CARD_NAME":
-            return { ...state, showAskDialog: action.show };
-        case "TOGGLE_DELETE_CONFIRMATION":
-            return { ...state, showDeleteConfirmationDialog: action.show };
+        case "UPDATE_CARD":
+            return { ...state, cards: state.cards.map(
+                (card) => card.title === action.card.title ? action.card : card) };
         case "TOGGLE_SETTINGS":
-            return { ...state, showSettings: action.show };
+            return { ...state, showSettings: action.title };
         default:
             return state;
     }

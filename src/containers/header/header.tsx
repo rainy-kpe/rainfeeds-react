@@ -8,12 +8,26 @@ import * as feedcard from "../../containers/feedCard/feedCard";
 import { IStoreState } from "../../store";
 import * as actions from "../../actions/cardActions";
 
-export interface IHeaderProps {
+interface IHeaderProps {
     application: string;
 }
 
-class HeaderComponent extends React.Component<IHeaderProps & actions.ICardState & actions.ICardDispatch> {
-    private text: string = "";
+interface IHeaderComponentState {
+    showAskName: boolean;
+}
+
+type IHeaderComponentProps = IHeaderProps & actions.ICardState & actions.ICardDispatch;
+
+class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComponentState> {
+    private newCardName: string = "";
+
+    constructor(props: IHeaderComponentProps, context: any) {
+        super(props, context);
+
+        this.state = {
+            showAskName: false
+        };
+    }
 
     public render() {
         return (<div className={style.header}>
@@ -21,17 +35,18 @@ class HeaderComponent extends React.Component<IHeaderProps & actions.ICardState 
                 <Dropdown icon="ellipsis vertical">
                     <Dropdown.Menu>
                         <Dropdown.Item text="Login" icon="user" />
-                        <Dropdown.Item text="Add card" icon="plus" onClick={() => this.props.toggleAskCardName(true)}/>
+                        <Dropdown.Item text="Add card" icon="plus"
+                            onClick={() => this.setState({ showAskName: true })}/>
                     </Dropdown.Menu>
                 </Dropdown>
-                <span className={style.title}>{ this.props.application }</span>
+                <span className={style.title}>{this.props.application}</span>
             </div>
             <div id={style.bottom} />
 
             <Modal dimmer="blurring"
                 size="mini"
-                open={this.props.showAskDialog}
-                onClose={() => this.props.toggleAskCardName(false) }>
+                open={this.state.showAskName}
+                onClose={() => this.setState({showAskName: false })}>
 
                 <Modal.Header>Give name for the card</Modal.Header>
                 <Modal.Content>
@@ -47,12 +62,12 @@ class HeaderComponent extends React.Component<IHeaderProps & actions.ICardState 
     }
 
     private onClose = () => {
-        this.props.toggleAskCardName(false);
-        this.props.addCard(this.text);
+        this.setState({ showAskName: false });
+        this.props.addCard(this.newCardName);
     }
 
     private onChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
-        this.text = (e.target as any).value;
+        this.newCardName = (e.target as any).value;
     }
 }
 

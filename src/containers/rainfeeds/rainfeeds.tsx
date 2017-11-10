@@ -4,6 +4,7 @@ import { Dispatch } from "redux";
 
 import { Header } from "../../containers/header/header";
 import { FeedCard } from "../../containers/feedCard/feedCard";
+import { Settings } from "../settings/settings";
 import * as style from "./rainfeeds.styl";
 import * as actions from "../../actions/cardActions";
 
@@ -22,6 +23,8 @@ class RainfeedsComponent extends React.Component<actions.ICardState> {
                         )
                     }
                 </div>
+
+                <Settings />
             </div>
         );
     }

@@ -26,7 +26,8 @@ const config: webpack.Configuration = {
             "redux",
             "redux-logger",
             "redux-thunk",
-            "semantic-ui-react"
+            "semantic-ui-react",
+            "moment"
         ]
     },
     output: {

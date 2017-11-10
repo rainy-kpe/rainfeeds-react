@@ -1,12 +1,9 @@
 * Production setup
 ** No map files in production
+** Uglify
 
-* Pug for JSX?
 * Some test framework
-* Uglify
 
-* react-actions
-* Move loaders to vendor chunk
 * Persist state between refreshes
 * Center header text in cards
 
@@ -14,3 +11,11 @@
 ** Don't allow empty names
 ** Don't allow duplicate names
 ** Focus the input when dialog is shown
+
+
+* Support for HackerNews
+
+* Login
+* Logout
+* Read feeds from the firebase
+* Write feeds to the firebase
