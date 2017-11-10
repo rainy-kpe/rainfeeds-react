@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import * as _ from "lodash";
 
-import { IStoreState } from "../store";
+import * as store from "../store";
 
 /* Type definitions */
 export interface IFeedEntry {
@@ -11,6 +11,7 @@ export interface IFeedEntry {
     time?: string;
     image?: string;
     imageLink?: string;
+    id?: any;
 }
 
 export interface IFeed {
@@ -39,7 +40,7 @@ export interface IFeedAction {
 
 /* Action creators */
 
-export const feedRequest = (title: string, url: string): IFeedAction => ({
+export const feedRequest = (title: string, url?: string): IFeedAction => ({
     type: "FEED_REQUEST",
     title,
     url
@@ -56,6 +57,64 @@ export const feedSuccess = (title: string, response: IFeed): IFeedAction => ({
     title,
     response
 });
+
+export const fetchHackerNews = (feedTitle: string) => {
+    return async (dispatch: Dispatch<IFeedAction>) => {
+        dispatch(feedRequest(feedTitle));
+
+        try {
+            const response = await fetch("https://hacker-news.firebaseio.com/v0/topstories.json");
+            const json = await response.json();
+
+            // Only download items which are new
+            const state = (store.store.getState() as store.IStoreState).feedState["Hacker News"];
+            const oldItems = state.feed ? state.feed.entries.map((entry) => entry.id) : [];
+
+            console.log("State", oldItems);
+
+            const fetches = _.range(0, 20).map(async (index) => {
+                if (!_.includes(oldItems, json[index])) {
+                    console.log(`Downloading hacker news item ${json[index]}`)
+                    const item = await fetch(`https://hacker-news.firebaseio.com/v0/item/${json[index]}.json`);
+                    return item.json();
+                } else {
+                    return null;
+                }
+            });
+
+            const result = await Promise.all(fetches);
+            console.log(feedTitle, result);
+
+            const entries = result.filter(entry => !!entry)
+                .map((entry: any) => {
+                    return <IFeedEntry> {
+                        title: entry.title,
+                        summary: `Score: ${entry.score} by ${entry.by} | Comments: ${entry.descendants}`,
+                        time: new Date(entry.time * 1000).toISOString(),
+                        link: entry.url,
+                        id: entry.id
+                    };
+                }).concat(state.feed ? state.feed.entries : []);
+
+            dispatch(feedSuccess(feedTitle, {
+                title: feedTitle,
+                date: new Date().toISOString(),
+                entries: result.map((entry: any) => {
+                    return {
+                        title: entry.title,
+                        entry: _.take(entries, 20),
+                        summary: `Score: ${entry.score} by ${entry.by} | Comments: ${entry.descendants}`,
+                        time: new Date(entry.time * 1000).toISOString(),
+                        link: entry.url,
+                        id: entry.id
+                    };
+                })
+            }));
+        } catch (error) {
+            dispatch(feedFailure(feedTitle, error));
+        }
+    };
+};
 
 export const fetchFeed = (feedTitle: string, url: string) => {
     return async (dispatch: Dispatch<IFeedAction>) => {
@@ -75,11 +134,15 @@ export const fetchFeed = (feedTitle: string, url: string) => {
                         let image;
                         let imageLink;
                         if (entry.content) {
-                            let re = entry.content.content.match(/img src=\"(.*?)\"/i);
-                            image = re && re.length > 1 ? re[1] : undefined;
+                            if (_.isObject(entry.content)) {
+                                image = entry.content.url;
+                            } else {
+                                let re = entry.content.content.match(/img src=\"(.*?)\"/i);
+                                image = re && re.length > 1 ? re[1] : undefined;
 
-                            re = entry.content.content.match(/.*href=\"(.*?)\">\[link/i);
-                            imageLink = re && re.length > 1 ? re[1] : undefined;
+                                re = entry.content.content.match(/.*href=\"(.*?)\">\[link/i);
+                                imageLink = re && re.length > 1 ? re[1] : undefined;
+                            }
                         }
 
                         let title = _.isObject(entry.title) ? entry.title.content : entry.title || "";

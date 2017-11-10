@@ -29,7 +29,11 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
     }
 
     public render() {
-        const options = [
+        const typeOptions = [
+            { key: "rss", value: "rss", text: "RSS Feed" },
+            { key: "hackernews", value: "hackernews", text: "Hacker News" }
+        ];
+        const rateOptions = [
             { key: 15, value: 15, text: "15 mins" },
             { key: 30, value: 30, text: "30 mins" },
             { key: 60, value: 60, text: "1 hour" }
@@ -41,12 +45,16 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
 
             <Modal.Header>Settings: {this.props.showSettings}</Modal.Header>
             <Modal.Content>
+                <div className={style.content}>Type:
+                    <Dropdown selection compact defaultValue={this.state.card ? this.state.card.type : "rss"}
+                        options={typeOptions} onChange={this.onTypeChange} />
+                </div>
                 <div className={style.content}>Update rate:
                     <Dropdown selection compact defaultValue={this.state.card ? this.state.card.updateRate : 60}
-                        options={options} onChange={this.onRateChange} />
+                        options={rateOptions} onChange={this.onRateChange} />
                 </div>
                 {
-                    this.state.card &&
+                    this.state.card && this.state.card.type === "rss" &&
                         this.state.card.urls.map((url: string, index: number) => (
                             <div className={style.items} key={index}>
                                 <Input defaultValue={url} fluid placeholder="Enter feed address"
@@ -55,7 +63,10 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
                             </div>
                         ))
                 }
-                <Button icon="plus" content="Add feed" onClick={this.onAddFeed}/>
+                {
+                    this.state.card && this.state.card.type === "rss" &&
+                        <Button icon="plus" content="Add feed" onClick={this.onAddFeed}/>
+                }
             </Modal.Content>
             <Modal.Actions>
                 <Button positive icon="checkmark" labelPosition="right" content="Save" onClick={this.onSave}/>
@@ -72,6 +83,12 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
 
     private onRateChange = (e: React.SyntheticEvent<HTMLInputElement>, data: any) => {
         this.state.card.updateRate = data.value;
+    }
+
+    private onTypeChange = (e: React.SyntheticEvent<HTMLInputElement>, data: any) => {
+        const newState = _.cloneDeep(this.state);
+        newState.card.type = data.value;
+        this.setState(newState);
     }
 
     private onUrlChange = (index: number, e: React.SyntheticEvent<HTMLInputElement>) => {

@@ -1,7 +1,7 @@
 {
     "name": "rainfeeds-react",
     "dependencies": {
-        "@types/react-redux": "^5.0.12",
+        "firebase": "^4.6.2",
         "lodash": "^4.17.4",
         "moment": "^2.19.1",
         "react": "^16.0.0",
@@ -13,12 +13,14 @@
         "semantic-ui-react": "^0.75.1"
     },
     "devDependencies": {
+        "@types/firebase": "^2.4.32",
         "@types/lodash": "^4.14.80",
         "@types/moment": "^2.13.0",
         "@types/node": "^8.0.47",
         "@types/react": "^16.0.18",
         "@types/react-dom": "^16.0.2",
         "@types/react-hot-loader": "^3.0.5",
+        "@types/react-redux": "^5.0.12",
         "@types/redux-logger": "^3.0.5",
         "@types/redux-thunk": "^2.1.0",
         "@types/webpack": "^3.0.14",
