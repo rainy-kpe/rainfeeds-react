@@ -10,6 +10,8 @@ import * as actions from "../../actions/cardActions";
 import * as feedActions from "../../actions/feedActions";
 import * as store from "../../store";
 import { Feed } from "../feed/feed";
+import { fetchFeed } from "../../feeds/rssFeed";
+import { fetchHackerNews } from "../../feeds/hnFeed";
 
 interface IFeedCardProps {
     title: string;
@@ -33,6 +35,12 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
 
     public componentDidMount() {
         this.refreshFeeds();
+
+        document.addEventListener("visibilitychange", this.onVisibilityChange, false);
+    }
+
+    public componentWillUnmount() {
+        document.removeEventListener("visibilitychange", this.onVisibilityChange);
     }
 
     public componentDidUpdate(prevProps: IFeedCardComponentProps, prevState: IFeedCardComponentState) {
@@ -91,21 +99,31 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     private refreshFeeds() {
         const card = _.find(this.props.cards, (c) => c.title === this.props.title);
         if (card) {
-            const fetchFeed = (url: string) => {
-                store.store.dispatch(feedActions.fetchFeed(this.props.title, url));
-                const id = setTimeout(() => fetchFeed(url), card.updateRate * 60 * 1000);
-                this.timeouts[url] = id;
+            const fetchFeedLoop = (name: string, callback: () => void) => {
+                if (this.props.feed) {
+                    setTimeout(() => callback(), Math.random() * 10000);
+                } else {
+                    callback();
+                }
+                const id = setTimeout(() => fetchFeedLoop(name, callback), card.updateRate * 60 * 1000);
+                this.timeouts[name] = id;
             };
 
             if (card.type === "hackernews") {
-                store.store.dispatch(feedActions.fetchHackerNews(this.props.title));
+                if (this.timeouts[card.title]) {
+                    clearTimeout(this.timeouts[card.title]);
+                }
+                fetchFeedLoop(card.title, () => store.store.dispatch(fetchHackerNews(this.props.title)));
             } else {
                 card.urls.forEach((url) => {
                     const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
                     "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
                     "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
 
-                    fetchFeed(yahooUrl);
+                    if (this.timeouts[yahooUrl]) {
+                        clearTimeout(this.timeouts[yahooUrl]);
+                    }
+                    fetchFeedLoop(yahooUrl, () => store.store.dispatch(fetchFeed(this.props.title, yahooUrl)));
                 });
             }
         }
@@ -122,6 +140,15 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
 
     private onConfig = (e: React.SyntheticEvent<HTMLElement>) => {
         this.props.toggleSettings(this.props.title);
+    }
+
+    private onVisibilityChange = () => {
+        const card = _.find(this.props.cards, (c) => c.title === this.props.title);
+        if (card && this.props.lastUpdate && (document as any).visibilityState === "visible") {
+            if (moment().diff(moment(this.props.lastUpdate), "minutes") > card.updateRate) {
+                this.refreshFeeds();
+            }
+        }
     }
 }
 

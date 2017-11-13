@@ -1,6 +1,7 @@
 * Production setup
 ** No map files in production
 ** Uglify
+** See: simple-redux-boilerplate
 
 * Some test framework
 

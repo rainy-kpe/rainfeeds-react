@@ -35,10 +35,9 @@ class FeedComponent extends React.Component<IFeedProps & IFeedState> {
                                 }
                                 <Item.Content className={style.title}>
                                     {this.renderHeading(item)}
-                                    {item.time && <Item.Meta>{moment(item.time).fromNow()}</Item.Meta>}
-                                    <Item.Description>
-                                        {item.summary}
-                                    </Item.Description>
+                                    {item.time ? <Item.Meta>{moment(item.time).fromNow()}</Item.Meta> : <br />}
+                                    <Item.Description as="a" target="_blank" href={item.summaryLink}
+                                        content={item.summary} />
                                 </Item.Content>
                             </Item>
                         ))

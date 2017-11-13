@@ -72,7 +72,7 @@ const initialState: ICardState = {
         { type: "rss", title: "Reddit", updateRate: 15, urls: [
             "http://www.reddit.com/.rss"
         ]},
-        { type: "hackernews", title: "Hacker News", updateRate: 30 },
+        { type: "hackernews", title: "Hacker News", updateRate: 30, urls: [] },
         { type: "rss", title: "Rainlendar", updateRate: 60, urls: [
             "http://www.rainlendar.net/cms/index.php?option=com_kunena&Itemid=42&func=fb_rss&no_html=1"]
         },
