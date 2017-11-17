@@ -115,16 +115,18 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                 }
                 fetchFeedLoop(card.title, () => store.store.dispatch(fetchHackerNews(this.props.title)));
             } else {
-                card.urls && card.urls.forEach((url) => {
-                    const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
-                    "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
-                    "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
+                if (card.urls) {
+                    card.urls.forEach((url) => {
+                        const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
+                        "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
+                        "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
 
-                    if (this.timeouts[yahooUrl]) {
-                        clearTimeout(this.timeouts[yahooUrl]);
-                    }
-                    fetchFeedLoop(yahooUrl, () => store.store.dispatch(fetchFeed(this.props.title, yahooUrl)));
-                });
+                        if (this.timeouts[yahooUrl]) {
+                            clearTimeout(this.timeouts[yahooUrl]);
+                        }
+                        fetchFeedLoop(yahooUrl, () => store.store.dispatch(fetchFeed(this.props.title, yahooUrl)));
+                    });
+                }
             }
         }
     }
