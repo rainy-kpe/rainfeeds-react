@@ -115,7 +115,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                 }
                 fetchFeedLoop(card.title, () => store.store.dispatch(fetchHackerNews(this.props.title)));
             } else {
-                card.urls.forEach((url) => {
+                card.urls && card.urls.forEach((url) => {
                     const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
                     "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
                     "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
@@ -135,7 +135,8 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
 
     private onRemove = (e: React.SyntheticEvent<HTMLElement>) => {
         this.setState({ showConfirmation: false });
-        this.props.removeCard(this.props.title);
+
+        store.store.dispatch(actions.removeCardFromDatabase(this.props.title));
     }
 
     private onConfig = (e: React.SyntheticEvent<HTMLElement>) => {

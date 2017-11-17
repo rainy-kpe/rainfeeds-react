@@ -5,6 +5,7 @@ import { default as thunk } from "redux-thunk";
 import { reducers } from "./actions/actions";
 import { ICardState } from "./actions/cardActions";
 import { IFeedState } from "./actions/feedActions";
+import { IAuthState } from "./actions/authActions";
 
 export const store = createStore(
     reducers,
@@ -14,4 +15,5 @@ export const store = createStore(
 export interface IStoreState {
     cardState: ICardState;
     feedState: IFeedState;
+    authState: IAuthState;
 }

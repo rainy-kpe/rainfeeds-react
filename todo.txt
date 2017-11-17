@@ -12,8 +12,3 @@
 ** Don't allow empty names
 ** Don't allow duplicate names
 ** Focus the input when dialog is shown
-
-* Login
-* Logout
-* Read feeds from the firebase
-* Write feeds to the firebase

@@ -1,12 +1,14 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Modal, Input, Button, Dropdown} from "semantic-ui-react";
+import { Modal, Input, Button, Icon} from "semantic-ui-react";
 import { Dispatch } from "redux";
+import * as _ from "lodash";
 
 import * as style from "./header.styl";
 import * as feedcard from "../../containers/feedCard/feedCard";
-import { IStoreState } from "../../store";
+import * as store from "../../store";
 import * as actions from "../../actions/cardActions";
+import * as authActions from "../../actions/authActions";
 
 interface IHeaderProps {
     application: string;
@@ -16,13 +18,15 @@ interface IHeaderComponentState {
     showAskName: boolean;
 }
 
-type IHeaderComponentProps = IHeaderProps & actions.ICardState & actions.ICardDispatch;
+type IHeaderComponentProps = IHeaderProps & actions.ICardState & authActions.IAuthState;
 
 class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComponentState> {
     private newCardName: string = "";
 
     constructor(props: IHeaderComponentProps, context: any) {
         super(props, context);
+
+        store.store.dispatch(authActions.initFirebase());
 
         this.state = {
             showAskName: false
@@ -32,14 +36,9 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
     public render() {
         return (<div className={style.header}>
             <div id={style.top}>
-                <Dropdown icon="ellipsis vertical">
-                    <Dropdown.Menu>
-                        <Dropdown.Item text="Login" icon="user" />
-                        <Dropdown.Item text="Add card" icon="plus"
-                            onClick={() => this.setState({ showAskName: true })}/>
-                    </Dropdown.Menu>
-                </Dropdown>
+                <Button icon="plus" size="mini" onClick={() => this.setState({ showAskName: true })}/>
                 <span className={style.title}>{this.props.application}</span>
+                { this.renderAuth() }
             </div>
             <div id={style.bottom} />
 
@@ -61,9 +60,24 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
         </div>);
     }
 
+    public renderAuth() {
+        if (this.props.authenticated) {
+            return (
+                <div>
+                    <span className={style.username}>{this.props.username}</span>
+                    <Icon id={style.user} name="user circle outline"
+                        onClick={() => store.store.dispatch(authActions.logout())} />
+                </div>
+            );
+        } else {
+            return <Icon id={style.user} name="user circle"
+                onClick={() => store.store.dispatch(authActions.login())} />;
+        }
+    }
+
     private onClose = () => {
         this.setState({ showAskName: false });
-        this.props.addCard(this.newCardName);
+        store.store.dispatch(actions.addCardToDatabase(this.newCardName));
     }
 
     private onChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -71,4 +85,10 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
     }
 }
 
-export const Header = connect(actions.mapStateToProps, actions.mapDispatchToProps)(HeaderComponent);
+const mapStateToProps = (state: store.IStoreState, ownProps: IHeaderProps):
+    actions.ICardState & authActions.IAuthState => {
+
+    return _.merge({}, state.cardState, state.authState);
+};
+
+export const Header = connect(mapStateToProps)(HeaderComponent);
