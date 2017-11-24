@@ -1,4 +1,4 @@
-import * as store from "../store";
+import { store, IStoreState } from "../store";
 import { Dispatch } from "redux";
 
 import * as actions from "../actions/feedActions";
@@ -13,7 +13,7 @@ export const fetchHackerNews = (feedTitle: string) => {
             const json = await response.json();
 
             // Only download items which are new
-            const state = (store.store.getState() as store.IStoreState).feedState["Hacker News"];
+            const state = (store.getState() as IStoreState).feedState["Hacker News"];
             const oldItems = state.feed ? state.feed.entries.map((entry) => entry.id) : [];
 
             const fetches = _.range(0, 30).map(async (index) => {
@@ -26,7 +26,10 @@ export const fetchHackerNews = (feedTitle: string) => {
             });
 
             const result = await Promise.all(fetches);
-            console.log(feedTitle, result);
+
+            if (BUILD === "development") {
+                console.log(feedTitle, result);
+            }
 
             const entries = result
                 .filter((entry) => !!entry)

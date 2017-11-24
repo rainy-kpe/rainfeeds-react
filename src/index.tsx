@@ -21,20 +21,28 @@ function rootElement() {
 document.body.appendChild(rootElement());
 document.body.className = style.bg;
 
+let root: any;
+if (BUILD === "development") {
+    root = <hot.AppContainer>
+                <Provider store={store}>
+                    <Rainfeeds />
+                </Provider>
+            </hot.AppContainer>;
+} else {
+    root = <Provider store={store}>
+               <Rainfeeds />
+           </Provider>;
+}
+
 const render = () => {
-    ReactDOM.render(
-        <hot.AppContainer>
-            <Provider store={store}>
-                <Rainfeeds />
-            </Provider>
-        </hot.AppContainer>,
-        document.getElementById("root"),
-    );
+    ReactDOM.render(root, document.getElementById("root"));
 };
 
 render();
 
-// Webpack Hot Module Replacement API
-if ((module as any).hot) {
-    (module as any).hot.accept("./containers/rainfeeds/rainfeeds", () => { render(); });
+if (BUILD === "development") {
+    // Webpack Hot Module Replacement API
+    if ((module as any).hot) {
+        (module as any).hot.accept("./containers/rainfeeds/rainfeeds", () => { render(); });
+    }
 }

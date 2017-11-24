@@ -7,9 +7,16 @@ import { ICardState } from "./actions/cardActions";
 import { IFeedState } from "./actions/feedActions";
 import { IAuthState } from "./actions/authActions";
 
+let middleWare;
+if (BUILD === "production") {
+    middleWare = applyMiddleware(thunk);
+} else {
+    middleWare = applyMiddleware(thunk, logger);
+}
+
 export const store = createStore(
     reducers,
-    applyMiddleware(thunk, logger)
+    middleWare
 );
 
 export interface IStoreState {

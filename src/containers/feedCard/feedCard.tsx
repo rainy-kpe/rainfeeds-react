@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as style from "./feedCard.styl";
 import * as actions from "../../actions/cardActions";
 import * as feedActions from "../../actions/feedActions";
-import * as store from "../../store";
+import { store, IStoreState } from "../../store";
 import { Feed } from "../feed/feed";
 import { fetchFeed } from "../../feeds/rssFeed";
 import { fetchHackerNews } from "../../feeds/hnFeed";
@@ -57,7 +57,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     }
 
     public render() {
-        const { title } = this.props;
+        const { title, feed, fetching } = this.props;
         return (
             <Card className={ style.card } raised>
                 <Card.Content>
@@ -65,9 +65,9 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                         { title }
                         { this.props.fetching && <Loader size="tiny" inline active /> }
                         { this.props.failure && <Icon name="warning sign" /> }
-                        <span className={style.subtitle}>{
-                            this.props.feed && !this.props.fetching ? moment(this.props.feed.date).fromNow() : ""
-                        }</span>
+                        <span className={style.subtitle}>
+                            {feed && !fetching ? moment(feed.date).fromNow() : ""}
+                        </span>
                         <Dropdown icon="ellipsis vertical">
                             <Dropdown.Menu>
                                 <Dropdown.Item text="Configure" icon="setting" onClick={this.onConfig}/>
@@ -78,7 +78,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                     </Card.Header>
                 </Card.Content>
                 <Card.Content className={ style.content }>
-                    <Feed title={title} />
+                    <Feed feed={feed} />
                 </Card.Content>
 
                 <Modal
@@ -113,7 +113,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                 if (this.timeouts[card.title]) {
                     clearTimeout(this.timeouts[card.title]);
                 }
-                fetchFeedLoop(card.title, () => store.store.dispatch(fetchHackerNews(this.props.title)));
+                fetchFeedLoop(card.title, () => store.dispatch(fetchHackerNews(this.props.title)));
             } else {
                 if (card.urls) {
                     card.urls.forEach((url) => {
@@ -124,7 +124,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                         if (this.timeouts[yahooUrl]) {
                             clearTimeout(this.timeouts[yahooUrl]);
                         }
-                        fetchFeedLoop(yahooUrl, () => store.store.dispatch(fetchFeed(this.props.title, yahooUrl)));
+                        fetchFeedLoop(yahooUrl, () => store.dispatch(fetchFeed(this.props.title, yahooUrl)));
                     });
                 }
             }
@@ -138,7 +138,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     private onRemove = (e: React.SyntheticEvent<HTMLElement>) => {
         this.setState({ showConfirmation: false });
 
-        store.store.dispatch(actions.removeCardFromDatabase(this.props.title));
+        store.dispatch(actions.removeCardFromDatabase(this.props.title));
     }
 
     private onConfig = (e: React.SyntheticEvent<HTMLElement>) => {
@@ -155,7 +155,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     }
 }
 
-export const mapStateToProps = (state: store.IStoreState, ownProps: IFeedCardProps):
+export const mapStateToProps = (state: IStoreState, ownProps: IFeedCardProps):
     actions.ICardState & feedActions.ISingleFeedState => {
 
     return _.merge({}, state.cardState, state.feedState[ownProps.title]);

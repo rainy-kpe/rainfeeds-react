@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import * as _ from "lodash";
 
 import * as feedcard from "../../containers/feedCard/feedCard";
-import * as store from "../../store";
+import { store, IStoreState } from "../../store";
 import * as actions from "../../actions/cardActions";
 import * as style from "./settings.styl";
 
@@ -76,7 +76,7 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
 
     private onSave = () => {
         this.props.toggleSettings(null);
-        store.store.dispatch(actions.updateCardToDatabase(this.state.card));
+        store.dispatch(actions.updateCardToDatabase(this.state.card));
     }
 
     private onRateChange = (e: React.SyntheticEvent<HTMLInputElement>, data: any) => {

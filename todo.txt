@@ -1,14 +1,3 @@
-* Production setup
-** No map files in production
-** Uglify
-** See: simple-redux-boilerplate
-
 * Some test framework
-
 * Persist state between refreshes
 * Center header text in cards
-
-* Add card:
-** Don't allow empty names
-** Don't allow duplicate names
-** Focus the input when dialog is shown

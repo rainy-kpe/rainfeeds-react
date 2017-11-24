@@ -1,27 +1,19 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import { Popup, Item } from "semantic-ui-react";
 import * as _ from "lodash";
 import * as moment from "moment";
 
 import * as style from "./feed.styl";
 import * as actions from "../../actions/feedActions";
-import * as store from "../../store";
 
 interface IFeedProps {
-    title: string;
-}
-
-interface IFeedState {
     feed: actions.IFeed;
-    fetching: boolean;
 }
 
-class FeedComponent extends React.Component<IFeedProps & IFeedState> {
+export class Feed extends React.Component<IFeedProps> {
 
     public render() {
-        const { title, feed } = this.props;
+        const { feed } = this.props;
 
         return (
             <Item.Group>
@@ -47,21 +39,11 @@ class FeedComponent extends React.Component<IFeedProps & IFeedState> {
     }
 
     private renderHeading(item: actions.IFeedEntry) {
-        return<Popup wide trigger={
+        return <Popup wide trigger={
                 <Item.Header as="a" target="_blank" href={item.link} content={item.title} />
             }>
             <div>{item.title}</div>
             <div className={style.summary}>{item.summary}</div>
         </Popup>;
     }
-
 }
-
-export const mapStateToProps = (state: store.IStoreState, ownProps: IFeedProps): IFeedState => {
-    if (state.feedState[ownProps.title]) {
-        return state.feedState[ownProps.title];
-    }
-    return { feed: null, fetching: false };
-};
-
-export const Feed = connect(mapStateToProps)(FeedComponent);

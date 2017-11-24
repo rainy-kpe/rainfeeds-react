@@ -12,7 +12,9 @@ export const fetchFeed = (feedTitle: string, url: string) => {
             const json = await response.json();
             const feed = json.query.results.feed;
 
-            console.log(feedTitle, feed);
+            if (BUILD === "development") {
+                console.log(feedTitle, feed);
+            }
 
             dispatch(actions.feedSuccess(feedTitle, {
                     title: _.isString(feed.title) ? feed.title : feed.title.content,

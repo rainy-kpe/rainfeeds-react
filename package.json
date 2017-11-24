@@ -40,11 +40,13 @@
         "typescript": "^2.5.3",
         "typings-for-css-modules-loader": "^1.7.0",
         "webpack": "^3.8.1",
-        "webpack-dev-server": "^2.9.3"
+        "webpack-dev-server": "^2.9.3",
+        "webpack-visualizer-plugin": "^0.1.11"
     },
     "scripts": {
-        "start": "webpack-dev-server --progress --inline --hot",
-        "build": "webpack",
+        "start": "NODE_ENV=development webpack-dev-server --progress --inline --hot",
+        "build": "NODE_ENV=production webpack",
+        "build-dev": "NODE_ENV=development webpack",
         "deploy": "firebase deploy"
     }
 }

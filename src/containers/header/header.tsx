@@ -6,7 +6,7 @@ import * as _ from "lodash";
 
 import * as style from "./header.styl";
 import * as feedcard from "../../containers/feedCard/feedCard";
-import * as store from "../../store";
+import { store, IStoreState } from "../../store";
 import * as actions from "../../actions/cardActions";
 import * as authActions from "../../actions/authActions";
 
@@ -16,27 +16,35 @@ interface IHeaderProps {
 
 interface IHeaderComponentState {
     showAskName: boolean;
+    addCardDisabled: boolean;
+    input?: any;
 }
 
 type IHeaderComponentProps = IHeaderProps & actions.ICardState & authActions.IAuthState;
 
 class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComponentState> {
     private newCardName: string = "";
+    private inputRef: any;
 
     constructor(props: IHeaderComponentProps, context: any) {
         super(props, context);
 
-        store.store.dispatch(authActions.initFirebase());
+        store.dispatch(authActions.initFirebase());
 
         this.state = {
-            showAskName: false
+            showAskName: false,
+            addCardDisabled: true
         };
+    }
+
+    public componentDidUpdate() {
+        setTimeout(() => this.inputRef ? this.inputRef.focus() : undefined, 100);
     }
 
     public render() {
         return (<div className={style.header}>
             <div id={style.top}>
-                <Button icon="plus" size="mini" onClick={() => this.setState({ showAskName: true })}/>
+                <Button icon="plus" size="mini" onClick={() => this.setState({ showAskName: true })} />
                 <span className={style.title}>{this.props.application}</span>
                 { this.renderAuth() }
             </div>
@@ -49,11 +57,14 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
 
                 <Modal.Header>Give name for the card</Modal.Header>
                 <Modal.Content>
-                    <Input onChange={this.onChange} fluid placeholder="Card name" />
+                    <Input ref={(input) => this.inputRef = input}
+                        onChange={this.onChange}
+                        fluid
+                        placeholder="Card name" />
                 </Modal.Content>
                 <Modal.Actions>
                     <Button positive icon="checkmark" labelPosition="right" content="Add card"
-                        onClick={this.onClose} />
+                        onClick={this.onClose} disabled={this.state.addCardDisabled} />
                 </Modal.Actions>
             </Modal>
 
@@ -66,26 +77,30 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
                 <div>
                     <span className={style.username}>{this.props.username}</span>
                     <Icon id={style.user} name="user circle outline"
-                        onClick={() => store.store.dispatch(authActions.logout())} />
+                        onClick={() => store.dispatch(authActions.logout())} />
                 </div>
             );
         } else {
             return <Icon id={style.user} name="user circle"
-                onClick={() => store.store.dispatch(authActions.login())} />;
+                onClick={() => store.dispatch(authActions.login())} />;
         }
     }
 
     private onClose = () => {
         this.setState({ showAskName: false });
-        store.store.dispatch(actions.addCardToDatabase(this.newCardName));
+        store.dispatch(actions.addCardToDatabase(this.newCardName));
     }
 
     private onChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
         this.newCardName = (e.target as any).value;
+
+        const addCardDisabled = !this.newCardName ||
+            _.some(this.props.cards, (card) => card.title === this.newCardName);
+        this.setState({ addCardDisabled });
     }
 }
 
-const mapStateToProps = (state: store.IStoreState, ownProps: IHeaderProps):
+const mapStateToProps = (state: IStoreState, ownProps: IHeaderProps):
     actions.ICardState & authActions.IAuthState => {
 
     return _.merge({}, state.cardState, state.authState);

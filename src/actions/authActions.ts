@@ -67,15 +67,11 @@ export const initFirebase = () => {
         };
         firebase.initializeApp(config);
 
-        console.log("Firebase initialized");
-
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                console.log("User authenticated");
                 dispatch(authSuccess(true, user.displayName));
                 dispatch(cardActions.getCardsFromDatabase());
             } else {
-                console.log("User not authenticated");
                 dispatch(authSuccess(false));
             }
         });

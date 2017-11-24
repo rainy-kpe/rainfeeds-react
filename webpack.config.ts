@@ -3,6 +3,7 @@ import * as path from "path";
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const VisualizerPlugin = require('webpack-visualizer-plugin');
 
 // Constant with our paths
 const paths = {
@@ -27,7 +28,8 @@ const config: webpack.Configuration = {
             "redux-logger",
             "redux-thunk",
             "semantic-ui-react",
-            "moment"
+            "moment",
+            "firebase"
         ]
     },
     output: {
@@ -49,14 +51,21 @@ const config: webpack.Configuration = {
     plugins: [
         new CleanWebpackPlugin([ "dist" ]),
         new HtmlWebpackPlugin({ title: "Rainfeeds", template: "./src/template-index.html" }),
-        new webpack.HotModuleReplacementPlugin(),
         new webpack.optimize.CommonsChunkPlugin({ name: "vendor" }),
-        new webpack.optimize.CommonsChunkPlugin({ name: "runtime" })
+        new webpack.optimize.CommonsChunkPlugin({ name: "runtime" }),
+        new webpack.DefinePlugin({ "BUILD": JSON.stringify(process.env.NODE_ENV) })
     ],
     devtool: "source-map",
     devServer: {
         contentBase: paths.DIST
     }
 };
+
+if (process.env.NODE_ENV === "development") {
+    config.plugins.push(new webpack.HotModuleReplacementPlugin());
+    config.plugins.push(new VisualizerPlugin());
+} else {
+    config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+}
 
 export default config;
