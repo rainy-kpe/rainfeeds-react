@@ -113,7 +113,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                 if (this.timeouts[card.title]) {
                     clearTimeout(this.timeouts[card.title]);
                 }
-                fetchFeedLoop(card.title, () => store.dispatch(fetchHackerNews(this.props.title)));
+                fetchFeedLoop(card.title, () => fetchHackerNews(this.props.title)(store.dispatch));
             } else {
                 if (card.urls) {
                     card.urls.forEach((url) => {
@@ -124,7 +124,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
                         if (this.timeouts[yahooUrl]) {
                             clearTimeout(this.timeouts[yahooUrl]);
                         }
-                        fetchFeedLoop(yahooUrl, () => store.dispatch(fetchFeed(this.props.title, yahooUrl)));
+                        fetchFeedLoop(yahooUrl, () => fetchFeed(this.props.title, yahooUrl)(store.dispatch));
                     });
                 }
             }
@@ -138,7 +138,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     private onRemove = (e: React.SyntheticEvent<HTMLElement>) => {
         this.setState({ showConfirmation: false });
 
-        store.dispatch(actions.removeCardFromDatabase(this.props.title));
+        actions.removeCardFromDatabase(this.props.title)(store.dispatch);
     }
 
     private onConfig = (e: React.SyntheticEvent<HTMLElement>) => {

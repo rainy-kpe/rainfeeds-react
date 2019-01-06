@@ -3,6 +3,7 @@ import { Dispatch } from "redux";
 
 import { IStoreState } from "../store";
 import * as cardActions from "./cardActions";
+import { ICardAction } from "./cardActions";
 
 /* Type definitions */
 export interface IAuthState {
@@ -55,7 +56,7 @@ export const mapStateToProps = (state: IStoreState): IAuthState => ({
 /* Helpers */
 
 export const initFirebase = () => {
-    return (dispatch: Dispatch<IAuthAction>) => {
+    return (dispatch: Dispatch<IAuthAction | ICardAction>) => {
         // Initialize Firebase
         const config = {
             apiKey: "AIzaSyCdcwfxWwwISxmHKEN3bmipmZ9J_HahWkA",
@@ -70,7 +71,7 @@ export const initFirebase = () => {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 dispatch(authSuccess(true, user.displayName));
-                dispatch(cardActions.getCardsFromDatabase());
+                cardActions.getCardsFromDatabase()(dispatch);
             } else {
                 dispatch(authSuccess(false));
             }
@@ -91,7 +92,7 @@ export const login = () => {
 };
 
 export const logout = () => {
-    return async (dispatch: Dispatch<IAuthAction>) => {
+    return async (dispatch: Dispatch<IAuthAction | ICardAction>) => {
         try {
             const result = await firebase.auth().signOut();
             dispatch(authSuccess(false));

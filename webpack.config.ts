@@ -15,22 +15,7 @@ const paths = {
 // Webpack configuration
 const config: webpack.Configuration = {
     entry: {
-        main: path.join(paths.SRC, "index.tsx"),
-        vendor: [
-            "react-hot-loader/patch",
-            "react-hot-loader",
-            "lodash",
-            "lodash-es",
-            "react",
-            "react-dom",
-            "react-redux",
-            "redux",
-            "redux-logger",
-            "redux-thunk",
-            "semantic-ui-react",
-            "moment",
-            "firebase"
-        ]
+        main: path.join(paths.SRC, "index.tsx")
     },
     output: {
         path: paths.DIST,
@@ -51,21 +36,29 @@ const config: webpack.Configuration = {
     plugins: [
         new CleanWebpackPlugin([ "dist" ]),
         new HtmlWebpackPlugin({ title: "Rainfeeds", template: "./src/template-index.html" }),
-        new webpack.optimize.CommonsChunkPlugin({ name: "vendor" }),
-        new webpack.optimize.CommonsChunkPlugin({ name: "runtime" }),
         new webpack.DefinePlugin({ "BUILD": JSON.stringify(process.env.NODE_ENV) })
     ],
-    devtool: "source-map",
-    devServer: {
-        contentBase: paths.DIST
-    }
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: "all"
+                }
+            }
+        }
+    },
+    devtool: "source-map"
 };
 
 if (process.env.NODE_ENV === "development") {
     config.plugins.push(new webpack.HotModuleReplacementPlugin());
     config.plugins.push(new VisualizerPlugin());
+    config.mode = "development";
 } else {
-    config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+    config.optimization.minimize = true;
+    config.mode = "production";
 }
 
 export default config;
