@@ -117,9 +117,10 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
             } else {
                 if (card.urls) {
                     card.urls.forEach((url) => {
-                        const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
-                        "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
-                        "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
+//                        const yahooUrl = "https://query.yahooapis.com/v1/public/yql" +
+//                        "?format=json&q=select%20*%20from%20feednormalizer%20where%20" +
+//                        "url=%22" + encodeURIComponent(url) + "%22%20and%20output=%22atom_1.0%22";
+                        const yahooUrl = "http://localhost:9000/feed?url=" + encodeURIComponent(url);
 
                         if (this.timeouts[yahooUrl]) {
                             clearTimeout(this.timeouts[yahooUrl]);

@@ -2,6 +2,7 @@ import { Dispatch } from "redux";
 
 import * as actions from "../actions/feedActions";
 import * as _ from "lodash";
+import * as FeedParser from "feedparser";
 
 export const fetchFeed = (feedTitle: string, url: string) => {
     return async (dispatch: Dispatch<actions.IFeedAction>) => {
@@ -9,8 +10,9 @@ export const fetchFeed = (feedTitle: string, url: string) => {
 
         try {
             const response = await fetch(url);
-            const json = await response.json();
-            const feed = json.query.results.feed;
+            const feed = await response.text());
+
+            const feedparser = new FeedParser([options]);
 
             if (BUILD === "development") {
                 console.log(feedTitle, feed);
@@ -52,6 +54,7 @@ export const fetchFeed = (feedTitle: string, url: string) => {
                 }
             ));
         } catch (error) {
+            console.error(error);
             dispatch(actions.feedFailure(feedTitle, error));
         }
     };
