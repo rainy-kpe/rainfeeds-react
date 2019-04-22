@@ -76,7 +76,7 @@ class SettingsComponent extends React.Component<ISettingsComponentProps, ISettin
 
     private onSave = () => {
         this.props.toggleSettings(null);
-        store.dispatch(actions.updateCardToDatabase(this.state.card));
+        actions.updateCardToDatabase(this.state.card)(store.dispatch);
     }
 
     private onRateChange = (e: React.SyntheticEvent<HTMLInputElement>, data: any) => {

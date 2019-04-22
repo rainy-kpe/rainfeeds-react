@@ -29,7 +29,7 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
     constructor(props: IHeaderComponentProps, context: any) {
         super(props, context);
 
-        store.dispatch(authActions.initFirebase());
+        authActions.initFirebase()(store.dispatch);
 
         this.state = {
             showAskName: false,
@@ -77,18 +77,18 @@ class HeaderComponent extends React.Component<IHeaderComponentProps, IHeaderComp
                 <div>
                     <span className={style.username}>{this.props.username}</span>
                     <Icon id={style.user} name="user circle outline"
-                        onClick={() => store.dispatch(authActions.logout())} />
+                        onClick={() => authActions.logout()(store.dispatch)} />
                 </div>
             );
         } else {
             return <Icon id={style.user} name="user circle"
-                onClick={() => store.dispatch(authActions.login())} />;
+                onClick={() => authActions.login()(store.dispatch)} />;
         }
     }
 
     private onClose = () => {
         this.setState({ showAskName: false });
-        store.dispatch(actions.addCardToDatabase(this.newCardName));
+        actions.addCardToDatabase(this.newCardName)(store.dispatch);
     }
 
     private onChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
