@@ -19,13 +19,18 @@ export interface ICardState {
 }
 
 export interface ICardAction {
-    type: "ADD_CARD" | "REMOVE_CARD" | "UPDATE_CARD" |  "CLEAR_CARDS" | "TOGGLE_SETTINGS";
+    type: "REMOVE_CARD" | "UPDATE_CARD" |  "CLEAR_CARDS" | "TOGGLE_SETTINGS";
     title?: string;
     card?: ICard;
 }
 
+export interface IAddCardAction {
+    type: "ADD_CARD";
+    titles: string[];
+}
+
 export interface ICardDispatch {
-    addCard: (title: string) => ICardAction;
+    addCard: (titles: string[]) => IAddCardAction;
     removeCard: (title: string) => ICardAction;
     updateCard: (card: ICard) => ICardAction;
     clearCards: () => ICardAction;
@@ -34,8 +39,8 @@ export interface ICardDispatch {
 
 /* Property mappers */
 
-export const mapDispatchToProps = (dispatch: Dispatch<ICardAction>): ICardDispatch => ({
-    addCard: (title: string) => dispatch(addCard(title)),
+export const mapDispatchToProps = (dispatch: Dispatch<ICardAction | IAddCardAction>): ICardDispatch => ({
+    addCard: (titles: string[]) => dispatch(addCard(titles)),
     removeCard: (title: string) => dispatch(removeCard(title)),
     updateCard: (card: ICard) => dispatch(updateCard(card)),
     clearCards: () => dispatch(clearCards()),
@@ -49,9 +54,9 @@ export const mapStateToProps = (state: IStoreState): ICardState => ({
 
 /* Action creators */
 
-export const addCard = (title: string): ICardAction => ({
+export const addCard = (titles: string[]): IAddCardAction => ({
     type: "ADD_CARD",
-    title
+    titles
 });
 
 export const removeCard = (title: string): ICardAction => ({
@@ -113,16 +118,16 @@ const initialState: ICardState = {
     showSettings: null
 };
 
-export const cardReducer = (state: ICardState = initialState, action: ICardAction) => {
+export const cardReducer = (state: ICardState = initialState, action: ICardAction | IAddCardAction) => {
     switch (action.type) {
         case "ADD_CARD":
-            return { ...state, cards: state.cards.concat({
+            return { ...state, cards: state.cards.concat(action.titles.map((title) => ({
                 type: "rss",
                 order: state.cards.length > 0 ? state.cards[state.cards.length - 1].order + 1 : 1,
-                title: action.title,
+                title,
                 urls: [],
                 updateRate: 60
-            }) };
+            } as ICard))) };
         case "REMOVE_CARD":
             return { ...state, cards: _.filter(state.cards, (card) => card.title !== action.title) };
         case "UPDATE_CARD":
@@ -147,8 +152,8 @@ export const getCardsFromDatabase = () => {
         if (data) {
             const cards = data.val() as {[title: string]: ICard};
             const cardArray = _.sortBy(_.map(cards, (card) => card), "order");
+            dispatch(addCard(cardArray.map((card) => card.title)));
             cardArray.forEach((card) => {
-                dispatch(addCard(card.title));
                 dispatch(updateCard(card));
             });
         }
@@ -162,7 +167,7 @@ export const addCardToDatabase = (title: string) => {
             await firebase.database().ref(`cards/${userId}/${title}`).set({
                 title
             });
-            dispatch(addCard(title));
+            dispatch(addCard([title]));
         } catch (error) {
             console.log(error);
         }

@@ -21,7 +21,7 @@ interface IFeedCardComponentState {
     showConfirmation: boolean;
 }
 
-type IFeedCardComponentProps = IFeedCardProps & actions.ICardDispatch & actions.ICardState &
+type IFeedCardComponentProps = IFeedCardProps & actions.ICardDispatch & { card: actions.ICard } &
     feedActions.ISingleFeedState;
 
 class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCardComponentState> {
@@ -43,11 +43,19 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
         document.removeEventListener("visibilitychange", this.onVisibilityChange);
     }
 
+    public shouldComponentUpdate(nextProps: IFeedCardComponentProps) {
+        const notEqualFeed = !_.isEqual(this.props.feed, nextProps.feed);
+        const notEqualCard = !_.isEqual(this.props.card, nextProps.card);
+        return notEqualFeed || notEqualCard;
+    }
+
     public componentDidUpdate(prevProps: IFeedCardComponentProps, prevState: IFeedCardComponentState) {
-        const oldCard = _.find(prevProps.cards, (c) => c.title === prevProps.title);
-        const newCard = _.find(this.props.cards, (c) => c.title === this.props.title);
+        const oldCard = prevProps.card;
+        const newCard = this.props.card;
 
         if (oldCard && newCard && !_.isEqual(oldCard, newCard)) {
+            console.log("componentDidUpdate: " + oldCard.title);
+
             // Cancel all timeouts
             _.values(this.timeouts).forEach((value) => clearTimeout(value));
 
@@ -97,7 +105,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     }
 
     private refreshFeeds() {
-        const card = _.find(this.props.cards, (c) => c.title === this.props.title);
+        const card = this.props.card;
         if (card) {
             const fetchFeedLoop = (name: string, callback: () => void) => {
                 if (this.props.feed) {
@@ -146,7 +154,7 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
     }
 
     private onVisibilityChange = () => {
-        const card = _.find(this.props.cards, (c) => c.title === this.props.title);
+        const card = this.props.card;
         if (card && this.props.lastUpdate && (document as any).visibilityState === "visible") {
             if (moment().diff(moment(this.props.lastUpdate), "minutes") > card.updateRate) {
                 this.refreshFeeds();
@@ -156,9 +164,12 @@ class FeedCardComponent extends React.Component<IFeedCardComponentProps, IFeedCa
 }
 
 export const mapStateToProps = (state: IStoreState, ownProps: IFeedCardProps):
-    actions.ICardState & feedActions.ISingleFeedState => {
+    { card: actions.ICard } & feedActions.ISingleFeedState => {
 
-    return _.merge({}, state.cardState, state.feedState[ownProps.title]);
+    const card = _.find(state.cardState.cards, (c) => c.title === ownProps.title);
+    const props = _.merge({}, { card }, state.feedState[card.title]);
+
+    return props;
 };
 
 export const FeedCard = connect(mapStateToProps, actions.mapDispatchToProps)(FeedCardComponent);
