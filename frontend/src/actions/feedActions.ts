@@ -66,7 +66,7 @@ const mergeFeeds = (current: IFeed, newFeed: IFeed) => {
     const entries = (current && current.entries || []).concat(newFeed.entries);
     let all: IFeedEntry[] = _.uniqBy(entries, (entry: IFeedEntry) => entry.title);
     if (entries.length > 0 && entries[0].time) {
-        all = all.sort((a: IFeedEntry, b: IFeedEntry) => {
+        all.sort((a: IFeedEntry, b: IFeedEntry) => {
             const dtA: Date = new Date(a.time);
             const dtB: Date = new Date(b.time);
             return dtB.getTime() - dtA.getTime();
