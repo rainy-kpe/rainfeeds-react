@@ -2,31 +2,43 @@
 
 ## Prerequirements
 
+At the server:
+
 ```
 apt-get install nodejs npm
 npm install -g forever
-ln -s /usr/bin/nodejs /usr/bin/node
 
 sudo adduser rainfeeds --disabled-password
 mkdir /home/rainfeeds/.ssh
 cp /root/.ssh/authorized_keys /home/rainfeeds/.ssh/
 chown -R rainfeeds.rainfeeds /home/rainfeeds/.ssh/
 
-ssh rainfeeds@rainclip.download "mkdir -p backend/dist"
-ssh rainfeeds@rainclip.download "mkdir -p frontend/dist"
+sudo su rainfeeds
+cd ~
+mkdir -p backend/dist
+mkdir -p frontend/dist
 ```
 
 ## Deploy Backend
+
 ```
-scp backend/dist/* rainfeeds@rainclip.download:~/backend/dist/
+scp backend/dist/* rainfeeds@rainclip:~/backend/dist/
 ```
 
 ## Deploy Frontend
+
 ```
-scp frontend/dist/* rainfeeds@rainclip.download:~/frontend/dist/
+scp frontend/dist/* rainfeeds@rainclip:~/frontend/dist/
+```
+
+## Start the Server
+
+```
+ssh rainfeeds@rainclip "cd backend && forever start dist/main.js"
 ```
 
 ## Restart the Server
+
 ```
-ssh rainfeeds@rainclip.download "cd backend && forever restart dist/main.js"
+ssh rainfeeds@rainclip "cd backend && forever restart dist/main.js"
 ```
