@@ -2,10 +2,8 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as hot from "react-hot-loader";
-import { createStore } from "redux";
 import { Provider } from "react-redux";
 
-import * as bg from "./images/bg.jpg";
 import * as style from "./styles/index.styl";
 import { store } from "./store";
 

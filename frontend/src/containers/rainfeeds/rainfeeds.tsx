@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
 
 import { Header } from "../../containers/header/header";
 import { FeedCard } from "../../containers/feedCard/feedCard";
