@@ -4,7 +4,7 @@ import Menu from "@material-ui/core/Menu"
 import MenuItem from "@material-ui/core/MenuItem"
 import Avatar from "@material-ui/core/Avatar"
 import { makeStyles } from "@material-ui/core/styles"
-import { logout } from "../../../firebase"
+import { logout } from "../../../utils/firebase"
 
 const useStyles = makeStyles(theme => ({
   avatar: {

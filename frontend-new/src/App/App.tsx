@@ -6,14 +6,15 @@ import Typography from "@material-ui/core/Typography"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import Alert from "@material-ui/lab/Alert"
-
 import Auth from "./Auth/Auth"
+import FeedCards from "./FeedCards/FeedCards"
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    flexGrow: 1
+    flexGrow: 1,
+    background: `url(${process.env.PUBLIC_URL}/bg.jpg)`
   },
   appBar: {
     backgroundColor: "black"
@@ -43,9 +44,7 @@ function App() {
             <Auth setShowAlert={setShowAlert} />
           </Toolbar>
         </AppBar>
-        <Typography variant="h4" className={classes.title}>
-          Hello WOrld
-        </Typography>
+        <FeedCards />
         {showAlert && <Alert severity="error">Login failed!</Alert>}
       </Suspense>
     </div>
