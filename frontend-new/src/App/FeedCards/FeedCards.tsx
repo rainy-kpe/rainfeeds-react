@@ -16,15 +16,16 @@ const useStyles = makeStyles(theme => ({
 function FeedCards() {
   const classes = useStyles()
   const cards = dataResource.getCards()
-  console.log(cards)
-  return <div className={classes.container}>{cards.length > 0 && <FeedCard card={cards[0]}></FeedCard>}</div>
-  // return (
-  //   <div className={classes.container}>
-  //     {cards.map(card => (
-  //       <FeedCard card={card} />
-  //     ))}
-  //   </div>
-  // )
+  // TODO: Error handling
+  return (
+    <div className={classes.container}>
+      {cards === undefined
+        ? null
+        : cards == null
+        ? "Reading cards failed"
+        : cards.map((card, index) => <FeedCard key={index} card={card} />)}
+    </div>
+  )
 }
 
 export default FeedCards

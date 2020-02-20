@@ -26,16 +26,15 @@ export const createAuthResource = () => {
   return {
     getUser: () => {
       if (authenticatedUser === undefined) {
-        console.log("User is not set -> Checking it from firebase")
         throw new Promise((resolve, reject) => {
           firebase.auth().onAuthStateChanged(
             user => {
-              console.log("onAuthStateChanged", user)
               authenticatedUser = user
               resolve(user)
             },
             error => {
               console.error(error)
+              authenticatedUser = null
               reject(error)
             }
           )
@@ -47,7 +46,7 @@ export const createAuthResource = () => {
 }
 
 export const createDataResource = () => {
-  let cards: CardData[] | undefined = undefined
+  let cards: CardData[] | null | undefined = undefined
   return {
     getCards: () => {
       const user = firebase.auth()!.currentUser
@@ -56,11 +55,17 @@ export const createDataResource = () => {
           .database()
           .ref(`cards/${user!.uid}`)
           .once("value")
-          .then(data => {
-            cards = Object.values(data.val() as { [title: string]: CardData })
-          })
+          .then(
+            data => {
+              cards = Object.values(data.val() as { [title: string]: CardData })
+            },
+            (error: any) => {
+              console.log(error)
+              cards = null
+            }
+          )
       }
-      return cards || []
+      return cards
     }
   }
 }

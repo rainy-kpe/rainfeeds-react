@@ -26,8 +26,6 @@ function Auth({ setShowAlert }: { setShowAlert: (show: boolean) => void }) {
       setShowAlert(true)
     }
   }
-
-  console.log(user, user?.photoURL)
   return (
     <div>
       {isAuth ? (
