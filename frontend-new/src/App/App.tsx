@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid"
 import Alert from "@material-ui/lab/Alert"
 import Auth from "./Auth/Auth"
 import FeedCards from "./FeedCards/FeedCards"
+import ReactTooltip from "react-tooltip"
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,6 +22,9 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     flexGrow: 1
+  },
+  tooltip: {
+    maxWidth: "400px"
   }
 }))
 
@@ -45,6 +49,7 @@ function App() {
           </Toolbar>
         </AppBar>
         <FeedCards />
+        <ReactTooltip className={classes.tooltip} multiline={true} scrollHide={true} />
         {showAlert && <Alert severity="error">Login failed!</Alert>}
       </Suspense>
     </div>

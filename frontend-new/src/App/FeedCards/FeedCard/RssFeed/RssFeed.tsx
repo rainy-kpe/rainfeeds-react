@@ -43,7 +43,7 @@ function renderRow(props: ListChildComponentProps) {
   const entry = data[index] as FeedEntry
   return (
     <ListItem button style={style} key={index}>
-      <Entry entry={entry} />
+      <Entry entry={entry} index={index} />
     </ListItem>
   )
 }

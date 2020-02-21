@@ -1,8 +1,7 @@
-import React from "react"
+import React, { useRef } from "react"
 import { FeedEntry } from "../../../../../utils/rssFeed"
 import { makeStyles } from "@material-ui/core/styles"
-import Typography from "@material-ui/core/Typography"
-import Tooltip from "@material-ui/core/Tooltip"
+import ReactTooltip from "react-tooltip"
 
 const useStyles = makeStyles(theme => ({
   entry: {
@@ -12,25 +11,49 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     fontWeight: 600
+  },
+  summary: {
+    fontSize: "80%",
+    color: "#888"
+  },
+  image: {
+    float: "left",
+    marginRight: "8px"
   }
 }))
 
-function Entry({ entry }: { entry: FeedEntry }) {
+function Entry({ entry, index }: { entry: FeedEntry; index: number }) {
   const classes = useStyles()
-  const tooltip = `${entry.title} - ${entry.summary}`
+  const element = useRef(null)
+  let tooltip = `${entry.title}<br>${entry.summary}`.substr(0, 500)
+  if (tooltip.length === 500) {
+    tooltip += "..."
+  }
 
   return (
-    <Tooltip title={tooltip}>
-      <div className={classes.entry}>
-        <Typography className={classes.title} variant="subtitle2" component="span">
-          {entry.title}
-        </Typography>
-        <br />
-        <Typography variant="body2" component="span" color="secondary">
-          {entry.summary}
-        </Typography>
-      </div>
-    </Tooltip>
+    <div
+      ref={element}
+      data-tip={tooltip}
+      data-place={index < 3 ? "bottom" : "top"}
+      className={classes.entry}
+      onMouseEnter={() => ReactTooltip.show(element.current!)}
+      onMouseLeave={() => ReactTooltip.hide(element.current!)}
+      onClick={() => window.open(entry.link, "_blank")}
+    >
+      {entry.image && (
+        <img
+          onClick={() => window.open(entry.imageLink || entry.link, "_blank")}
+          className={classes.image}
+          alt={entry.imageLink}
+          src={entry.image}
+          width="48px"
+          height="48px"
+        />
+      )}
+      <span className={classes.title}>{entry.title}</span>
+      <br />
+      <span className={classes.summary}>{entry.summary}</span>
+    </div>
   )
 }
 
