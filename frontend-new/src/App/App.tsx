@@ -3,9 +3,9 @@ import { makeStyles } from "@material-ui/core/styles"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import Header from "./Header"
-import ReactTooltip from "react-tooltip"
-import FeedCards from "./FeedCards/FeedCards"
 import Alert from "@material-ui/lab/Alert"
+import FeedCards from "./FeedCards"
+import ReactTooltip from "react-tooltip"
 import { login, logout } from "../utils/firebase"
 
 const useStyles = makeStyles(theme => ({

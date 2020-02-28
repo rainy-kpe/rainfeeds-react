@@ -1,9 +1,9 @@
 import React, { useReducer } from "react"
-import { createRSSResource, Feed, FeedEntry } from "../../../../utils/rssFeed"
+import { createRSSResource, Feed, FeedEntry } from "../utils/rssFeed"
 import { makeStyles } from "@material-ui/core/styles"
 import Alert from "@material-ui/lab/Alert"
 import Button from "@material-ui/core/Button"
-import Entry from "./Entry/Entry"
+import Entry from "./Entry"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import ListItem from "@material-ui/core/ListItem"
 import Measure from "react-measure"
@@ -48,13 +48,25 @@ function renderRow(props: ListChildComponentProps) {
   )
 }
 
-function RssFeed({ urls }: { urls: string[] }) {
+function RssFeed({ urls, setDate }: { urls: string[]; setDate: (date: string) => void }) {
   const classes = useStyles()
   const [, forceUpdate] = useReducer(x => x + 1, 0)
   const feeds = urls.map(url => rssResource.getFeed(url))
 
   const fails = feeds.filter(feed => !feed)
-  const entries = mergeFeedEntries(feeds.filter(feed => !!feed) as Feed[])
+  const succeeded = feeds.filter(feed => !!feed) as Feed[]
+  const entries = mergeFeedEntries(succeeded)
+
+  const date = succeeded
+    .map(feed => (feed.date ? new Date(feed.date) : null))
+    .filter(date => !!date)
+    .reduce<Date | null>((acc, current) => {
+      return acc === null || current! < acc ? current : acc
+    }, null)
+
+  if (date) {
+    setDate(date.toISOString())
+  }
 
   const handleRetry = () => {
     urls.forEach(url => rssResource.invalidate(url))

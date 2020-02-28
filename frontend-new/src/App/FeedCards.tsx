@@ -1,6 +1,6 @@
 import React from "react"
-import { createDataResource } from "../../utils/firebase"
-import FeedCard from "./FeedCard/FeedCard"
+import { createDataResource } from "../utils/firebase"
+import FeedCard from "./FeedCard"
 import { makeStyles } from "@material-ui/core/styles"
 
 const dataResource = createDataResource()
