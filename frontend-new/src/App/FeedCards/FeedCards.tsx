@@ -16,7 +16,6 @@ const useStyles = makeStyles(theme => ({
 function FeedCards() {
   const classes = useStyles()
   const cards = dataResource.getCards()
-  // TODO: Error handling
   return (
     <div className={classes.container}>
       {cards === undefined

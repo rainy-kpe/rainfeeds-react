@@ -33,7 +33,7 @@ export const createAuthResource = () => {
               resolve(user)
             },
             error => {
-              console.error(error)
+              console.error("Authentication failed", error)
               authenticatedUser = null
               reject(error)
             }
@@ -60,7 +60,7 @@ export const createDataResource = () => {
               cards = Object.values(data.val() as { [title: string]: CardData })
             },
             (error: any) => {
-              console.log(error)
+              console.error("Reading data from user failed", error)
               cards = null
             }
           )

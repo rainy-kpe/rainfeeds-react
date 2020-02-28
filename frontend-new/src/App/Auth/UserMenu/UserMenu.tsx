@@ -4,7 +4,6 @@ import Menu from "@material-ui/core/Menu"
 import MenuItem from "@material-ui/core/MenuItem"
 import Avatar from "@material-ui/core/Avatar"
 import { makeStyles } from "@material-ui/core/styles"
-import { logout } from "../../../utils/firebase"
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -13,7 +12,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function UserMenu({ user, setAuth }: { user: firebase.User; setAuth: (auth: boolean) => void }) {
+function UserMenu({ user, onLogout }: { user: firebase.User; onLogout: () => Promise<void> }) {
   const classes = useStyles()
   const [anchor, setAnchor] = useState<Element | null>(null)
 
@@ -26,8 +25,7 @@ function UserMenu({ user, setAuth }: { user: firebase.User; setAuth: (auth: bool
   }
 
   const handleLogout = () => {
-    logout()
-    setAuth(false)
+    onLogout()
     handleClose()
   }
 
