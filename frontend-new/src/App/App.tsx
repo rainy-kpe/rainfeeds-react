@@ -6,8 +6,8 @@ import Typography from "@material-ui/core/Typography"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import Alert from "@material-ui/lab/Alert"
-import Auth from "./Auth/Auth"
-import FeedCards from "./FeedCards/FeedCards"
+import Auth from "./Auth"
+import FeedCards from "./FeedCards"
 import ReactTooltip from "react-tooltip"
 
 const useStyles = makeStyles(theme => ({

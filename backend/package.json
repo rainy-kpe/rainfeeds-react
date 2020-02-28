@@ -2,7 +2,8 @@
     "name": "rainfeeds-server",
     "dependencies": {
         "axios": "^0.19.0",
-        "express": "^4.16.4"
+        "express": "^4.16.4",
+        "iconv-lite": "^0.5.1"
     },
     "devDependencies": {
         "@types/express": "^4.17.2",

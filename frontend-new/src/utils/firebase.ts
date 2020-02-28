@@ -57,7 +57,7 @@ export const createDataResource = () => {
           .once("value")
           .then(
             data => {
-              cards = Object.values(data.val() as { [title: string]: CardData })
+              cards = Object.values(data.val() as { [title: string]: CardData }).sort((a, b) => a.order - b.order)
             },
             (error: any) => {
               console.log(error)
