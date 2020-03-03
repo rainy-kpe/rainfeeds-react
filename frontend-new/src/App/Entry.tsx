@@ -1,5 +1,5 @@
 import React, { useRef } from "react"
-import { FeedEntry } from "../utils/rssFeed"
+import { FeedEntry } from "../utils/feed"
 import { makeStyles } from "@material-ui/core/styles"
 import ReactTooltip from "react-tooltip"
 

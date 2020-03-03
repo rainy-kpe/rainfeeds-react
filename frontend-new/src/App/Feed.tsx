@@ -1,5 +1,6 @@
-import React, { useReducer } from "react"
-import { createRSSResource, Feed, FeedEntry } from "../utils/rssFeed"
+import React, { useReducer, useEffect } from "react"
+import { createRSSResource } from "../utils/rssFeed"
+import { createHNResource } from "../utils/hnFeed"
 import { makeStyles } from "@material-ui/core/styles"
 import Alert from "@material-ui/lab/Alert"
 import Button from "@material-ui/core/Button"
@@ -7,8 +8,10 @@ import Entry from "./Entry"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import ListItem from "@material-ui/core/ListItem"
 import Measure from "react-measure"
+import { Feed, FeedEntry } from "../utils/feed"
 
 const rssResource = createRSSResource()
+const hnResource = createHNResource()
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -48,10 +51,47 @@ function renderRow(props: ListChildComponentProps) {
   )
 }
 
-function RssFeed({ urls, setDate }: { urls: string[]; setDate: (date: string) => void }) {
+function RssFeed({
+  urls,
+  setDate,
+  type,
+  updateRate
+}: {
+  urls: string[]
+  setDate: (date: string) => void
+  type: "rss" | "hackernews"
+  updateRate: number
+}) {
   const classes = useStyles()
   const [, forceUpdate] = useReducer(x => x + 1, 0)
-  const feeds = urls.map(url => rssResource.getFeed(url))
+  const feeds = type === "rss" ? urls.map(url => rssResource.getFeed(url)) : [hnResource.getFeed()]
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (type === "rss") {
+        await hnResource.update()
+      } else {
+        for (const url in urls) {
+          await rssResource.update(url)
+        }
+      }
+      forceUpdate()
+    }, updateRate * 60 * 1000)
+    return () => {
+      clearInterval(interval)
+    }
+  }, [updateRate, urls, type])
+
+  const handleVisibilityChange = () => {
+    console.log(document.visibilityState)
+  }
+
+  useEffect(() => {
+    document.addEventListener("visibilitychange", handleVisibilityChange, false)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
 
   const fails = feeds.filter(feed => !feed)
   const succeeded = feeds.filter(feed => !!feed) as Feed[]
@@ -75,7 +115,7 @@ function RssFeed({ urls, setDate }: { urls: string[]; setDate: (date: string) =>
 
   return (
     <div className={classes.feed}>
-      {fails.length > 0 || entries.length === 0 ? (
+      {fails.length > 0 && (
         <Alert
           className={classes.alert}
           severity="error"
@@ -85,25 +125,24 @@ function RssFeed({ urls, setDate }: { urls: string[]; setDate: (date: string) =>
             </Button>
           }
         >
-          Failed to read the feeds
+          Failed to read some of the feeds
         </Alert>
-      ) : (
-        <Measure>
-          {({ contentRect, measureRef }) => (
-            <div ref={measureRef}>
-              <FixedSizeList
-                itemData={entries}
-                height={400}
-                width={contentRect.entry.width}
-                itemSize={50}
-                itemCount={entries.length}
-              >
-                {renderRow}
-              </FixedSizeList>
-            </div>
-          )}
-        </Measure>
       )}
+      <Measure>
+        {({ contentRect, measureRef }) => (
+          <div ref={measureRef}>
+            <FixedSizeList
+              itemData={entries}
+              height={fails.length > 0 ? 350 : 400}
+              width={contentRect.entry.width}
+              itemSize={50}
+              itemCount={entries.length}
+            >
+              {renderRow}
+            </FixedSizeList>
+          </div>
+        )}
+      </Measure>
     </div>
   )
 }

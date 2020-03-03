@@ -1,21 +1,8 @@
 import Parser from "rss-parser"
-
-export interface Feed {
-  title?: string
-  date: string
-  entries: FeedEntry[]
-}
-
-export interface FeedEntry {
-  title: string
-  summary: string
-  time: string
-  link?: string
-  image?: string
-  imageLink?: string
-}
+import { Feed } from "../utils/feed"
 
 const parseUrl = async (url: string): Promise<Feed> => {
+  console.log(`${new Date().toISOString()} Downloading ${url}`)
   const parser = new Parser()
   const feed = await parser.parseURL(`/feed?url=${encodeURIComponent(url)}`)
 
@@ -80,6 +67,15 @@ export const createRSSResource = () => {
       }
       return feeds.get(url)
     },
-    invalidate: (url: string) => feeds.delete(url)
+    invalidate: (url: string) => feeds.delete(url),
+    update: async (url: string) =>
+      parseUrl(url).then(
+        feed => {
+          feeds.set(url, feed)
+        },
+        (error: any) => {
+          console.error(`Failed to parse feed from url ${url}`, error)
+        }
+      )
   }
 }

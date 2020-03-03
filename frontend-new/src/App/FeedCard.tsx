@@ -4,7 +4,7 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import Typography from "@material-ui/core/Typography"
 import { makeStyles } from "@material-ui/core/styles"
-import RssFeed from "./RssFeed"
+import Feed from "./Feed"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
@@ -55,7 +55,7 @@ function FeedCard({ card }: { card: CardData }) {
             </Grid>
           }
         >
-          <RssFeed urls={card.urls || []} setDate={setDate} />
+          <Feed urls={card.urls || []} setDate={setDate} type={card.type} updateRate={card.updateRate} />
         </Suspense>
       </CardContent>
     </Card>
