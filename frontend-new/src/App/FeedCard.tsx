@@ -8,6 +8,7 @@ import Feed from "./Feed"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
+import CardMenu from "./CardMenu"
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -25,20 +26,24 @@ const useStyles = makeStyles(theme => ({
     padding: "0 !important"
   },
   title: {
-    padding: "16px",
+    padding: "0 16px",
     background: "#eeeeee",
     display: "flex",
-    alignItems: "baseline"
+    alignItems: "center"
   },
   date: {
     color: "#888888",
-    marginLeft: "8px"
+    marginLeft: "8px",
+    flex: 1
+  },
+  menu: {
+    justifySelf: "right"
   }
 }))
 
-function FeedCard({ card }: { card: CardData }) {
+function FeedCard({ card, removeCard }: { card: CardData; removeCard: (card: CardData) => Promise<void> }) {
   const classes = useStyles()
-  const [date, setDate] = useState("hello")
+  const [date, setDate] = useState("")
   return (
     <Card className={classes.card}>
       <CardContent className={classes.content}>
@@ -46,6 +51,9 @@ function FeedCard({ card }: { card: CardData }) {
           <Typography variant="h6">{card.title}</Typography>
           <span className={classes.date}>
             <TimeAgo date={date} />
+          </span>
+          <span className={classes.menu}>
+            <CardMenu card={card} removeCard={removeCard} />
           </span>
         </div>
         <Suspense

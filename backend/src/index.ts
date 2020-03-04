@@ -33,7 +33,8 @@ app.get("/feed", async (req, res) => {
         // Axios fails on downloading rss feed from Rainlendar.net so let's use curl instead
         exec(`curl "${decoded}"`, { maxBuffer: 1024 * 1024 }, (error, stdout) => {
           if (error) {
-            throw error
+            console.error(error)
+            res.sendStatus(500)
           } else {
             addToCache(decoded, stdout)
             res.send(stdout)

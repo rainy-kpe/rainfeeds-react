@@ -68,7 +68,7 @@ function RssFeed({
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (type === "rss") {
+      if (type !== "rss") {
         await hnResource.update()
       } else {
         for (const url in urls) {

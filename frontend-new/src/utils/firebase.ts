@@ -66,6 +66,18 @@ export const createDataResource = () => {
           )
       }
       return cards
+    },
+    invalidate: () => {
+      cards = undefined
+    },
+    remove: (title: string) => {
+      cards = cards?.filter(card => card.title !== title)
+    },
+    add: (title: string) => {
+      cards?.push({ title: title, type: "rss", order: cards.length + 1, updateRate: 60 })
+    },
+    get: (title: string) => {
+      return cards?.find(card => card.title === title)
     }
   }
 }
@@ -76,3 +88,23 @@ export const login = async () => {
 }
 
 export const logout = () => firebase.auth().signOut()
+
+export const deleteCard = async (title: string) => {
+  try {
+    const userId = firebase.auth().currentUser!.uid
+    await firebase
+      .database()
+      .ref(`cards/${userId}/${title}`)
+      .remove()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const addCard = async (card: CardData) => {
+  const userId = firebase.auth().currentUser!.uid
+  await firebase
+    .database()
+    .ref(`cards/${userId}/${card.title}`)
+    .set(card)
+}
