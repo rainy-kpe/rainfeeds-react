@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { createRSSResource } from "../utils/rssFeed"
 import { createHNResource } from "../utils/hnFeed"
 import { makeStyles } from "@material-ui/core/styles"
@@ -63,7 +63,7 @@ function RssFeed({
   updateRate: number
 }) {
   const classes = useStyles()
-  const [, forceUpdate] = useReducer(x => x + 1, 0)
+  const [lastUpdate, setLastUpdate] = useState(new Date())
   const feeds = type === "rss" ? urls.map(url => rssResource.getFeed(url)) : [hnResource.getFeed()]
 
   useEffect(() => {
@@ -71,27 +71,32 @@ function RssFeed({
       if (type !== "rss") {
         await hnResource.update()
       } else {
-        for (const url in urls) {
+        for (const url of urls) {
           await rssResource.update(url)
         }
       }
-      forceUpdate()
-    }, updateRate * 60 * 1000)
+      setLastUpdate(new Date())
+    }, (updateRate || 60) * 60 * 1000)
     return () => {
       clearInterval(interval)
     }
   }, [updateRate, urls, type])
 
-  const handleVisibilityChange = () => {
-    console.log(document.visibilityState)
-  }
-
   useEffect(() => {
-    document.addEventListener("visibilitychange", handleVisibilityChange, false)
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    const handleFocusChange = () => {
+      const nextUpdate = new Date(lastUpdate.getTime() + (updateRate || 60) * 60000)
+      console.log("Focused", nextUpdate)
+      if (new Date().getTime() > nextUpdate.getTime()) {
+        type === "rss" ? urls.map(url => rssResource.invalidate(url)) : hnResource.invalidate()
+        setLastUpdate(new Date())
+      }
     }
-  }, [])
+
+    window.addEventListener("focus", handleFocusChange)
+    return () => {
+      window.removeEventListener("focus", handleFocusChange)
+    }
+  }, [updateRate, lastUpdate])
 
   const fails = feeds.filter(feed => !feed)
   const succeeded = feeds.filter(feed => !!feed) as Feed[]
@@ -110,7 +115,7 @@ function RssFeed({
 
   const handleRetry = () => {
     urls.forEach(url => rssResource.invalidate(url))
-    forceUpdate()
+    setLastUpdate(new Date())
   }
 
   return (

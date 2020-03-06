@@ -78,6 +78,9 @@ export const createDataResource = () => {
     },
     get: (title: string) => {
       return cards?.find(card => card.title === title)
+    },
+    update: (updated: CardData) => {
+      cards = [...cards!.filter(card => card.title !== updated.title), updated]
     }
   }
 }
@@ -101,7 +104,7 @@ export const deleteCard = async (title: string) => {
   }
 }
 
-export const addCard = async (card: CardData) => {
+export const upsertCard = async (card: CardData) => {
   const userId = firebase.auth().currentUser!.uid
   await firebase
     .database()

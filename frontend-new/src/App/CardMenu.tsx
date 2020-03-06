@@ -6,10 +6,12 @@ import IconButton from "@material-ui/core/IconButton"
 import MenuIcon from "@material-ui/icons/Menu"
 import Divider from "@material-ui/core/Divider"
 import ConfirmationDialog from "./ConfirmationDialog"
+import SettingsDialog from "./SettingsDialog"
 
 function CardMenu({ card, removeCard }: { card: CardData; removeCard: (card: CardData) => Promise<void> }) {
   const [anchor, setAnchor] = useState<Element | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const handleClick = (event: React.SyntheticEvent) => {
     setAnchor(event.currentTarget)
@@ -26,13 +28,24 @@ function CardMenu({ card, removeCard }: { card: CardData; removeCard: (card: Car
     }
   }
 
+  const handleSettings = (confirmed: boolean) => {
+    setSettingsOpen(false)
+  }
+
   return (
     <div>
       <IconButton aria-label="menu" aria-haspopup="true" onClick={handleClick}>
         <MenuIcon />
       </IconButton>
       <Menu id="avatar-menu" anchorEl={anchor} keepMounted open={!!anchor} onClose={handleClose}>
-        <MenuItem>Settings...</MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose()
+            setSettingsOpen(true)
+          }}
+        >
+          Settings...
+        </MenuItem>
         <Divider />
         <MenuItem
           onClick={() => {
@@ -46,6 +59,7 @@ function CardMenu({ card, removeCard }: { card: CardData; removeCard: (card: Car
       <ConfirmationDialog title={`Delete '${card.title}'?`} open={deleteOpen} onClose={handleDeleteCard}>
         Do you really want to delete this card? The content will be permanently gone.
       </ConfirmationDialog>
+      <SettingsDialog open={settingsOpen} onClose={handleSettings} card={card} />
     </div>
   )
 }

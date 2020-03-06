@@ -5,9 +5,9 @@ import DialogActions from "@material-ui/core/DialogActions"
 import Dialog from "@material-ui/core/Dialog"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
-import { Formik } from "formik"
+import { Formik, FormikErrors } from "formik"
 import Alert from "@material-ui/lab/Alert"
-import { addCard, createDataResource } from "../utils/firebase"
+import { upsertCard, createDataResource } from "../utils/firebase"
 
 interface FormValues {
   title: string
@@ -34,7 +34,7 @@ function AddCardDialog({
     try {
       setShowAlert(false)
       resource.add(values.title)
-      await addCard(resource.get(values.title)!)
+      await upsertCard(resource.get(values.title)!)
       handleClose(true)
     } catch (error) {
       console.error(error)
@@ -51,7 +51,7 @@ function AddCardDialog({
       <Formik
         initialValues={initialValues}
         validate={values => {
-          const errors: any = {}
+          const errors: FormikErrors<FormValues> = {}
           if (!values.title) {
             errors.title = "Required"
           } else if (allCardTitles.includes(values.title.toLowerCase())) {
@@ -95,27 +95,3 @@ function AddCardDialog({
 }
 
 export default AddCardDialog
-
-/*
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            value={values.email}
-          />
-          {errors.email && touched.email && errors.email}
-          <input
-            type="password"
-            name="password"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            value={values.password}
-          />
-          {errors.password && touched.password && errors.password}
-          <button type="submit" disabled={isSubmitting}>
-            Submit
-          </button>
-        </form>
- */
