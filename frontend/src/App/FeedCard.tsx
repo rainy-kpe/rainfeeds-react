@@ -4,7 +4,7 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import Typography from "@material-ui/core/Typography"
 import { makeStyles } from "@material-ui/core/styles"
-import Feed from "./Feed"
+import FeedList from "./FeedList"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function FeedCard({ card, removeCard }: { card: CardData; removeCard: (card: CardData) => Promise<void> }) {
+function FeedCard({ card, forceUpdate }: { card: CardData; forceUpdate: () => void }) {
   const classes = useStyles()
   const [date, setDate] = useState("")
   return (
@@ -49,11 +49,9 @@ function FeedCard({ card, removeCard }: { card: CardData; removeCard: (card: Car
       <CardContent className={classes.content}>
         <div className={classes.title}>
           <Typography variant="h6">{card.title}</Typography>
-          <span className={classes.date}>
-            <TimeAgo date={date} />
-          </span>
+          <span className={classes.date}>{date && <TimeAgo date={date} />}</span>
           <span className={classes.menu}>
-            <CardMenu card={card} removeCard={removeCard} />
+            <CardMenu card={card} forceUpdate={forceUpdate} />
           </span>
         </div>
         <Suspense
@@ -63,7 +61,7 @@ function FeedCard({ card, removeCard }: { card: CardData; removeCard: (card: Car
             </Grid>
           }
         >
-          <Feed urls={card.urls || []} setDate={setDate} type={card.type} updateRate={card.updateRate} />
+          <FeedList card={card} setDate={setDate} />
         </Suspense>
       </CardContent>
     </Card>

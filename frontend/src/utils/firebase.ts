@@ -45,7 +45,7 @@ export const createAuthResource = () => {
   }
 }
 
-export const createDataResource = () => {
+export const createCardResource = () => {
   let cards: CardData[] | null | undefined = undefined
   return {
     getCards: () => {

@@ -1,5 +1,0 @@
-* Some test framework
-* Persist state between refreshes
-* Center header text in cards
-* Link to the main page from the header
-

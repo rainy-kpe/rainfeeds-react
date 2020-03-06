@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useContext } from "react"
 import DialogTitle from "@material-ui/core/DialogTitle"
 import DialogContent from "@material-ui/core/DialogContent"
 import DialogActions from "@material-ui/core/DialogActions"
@@ -7,7 +7,8 @@ import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import { Formik, FormikErrors } from "formik"
 import Alert from "@material-ui/lab/Alert"
-import { upsertCard, createDataResource } from "../utils/firebase"
+import { upsertCard } from "../utils/firebase"
+import DataContext from "./DataContext"
 
 interface FormValues {
   title: string
@@ -16,15 +17,14 @@ interface FormValues {
 function AddCardDialog({
   open,
   onClose,
-  allCardTitles,
-  resource
+  allCardTitles
 }: {
   open: boolean
   onClose: (accepted: boolean) => void
   allCardTitles: string[]
-  resource: ReturnType<typeof createDataResource>
 }) {
   const initialValues: FormValues = { title: "" }
+  const { cards } = useContext(DataContext)
   const [showAlert, setShowAlert] = useState(false)
   const handleClose = (accepted: boolean) => {
     setShowAlert(false)
@@ -33,8 +33,8 @@ function AddCardDialog({
   const handleFormSubmit = async (values: FormValues, helpers: any) => {
     try {
       setShowAlert(false)
-      resource.add(values.title)
-      await upsertCard(resource.get(values.title)!)
+      cards.add(values.title)
+      await upsertCard(cards.get(values.title)!)
       handleClose(true)
     } catch (error) {
       console.error(error)

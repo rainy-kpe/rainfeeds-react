@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useContext } from "react"
 import DialogTitle from "@material-ui/core/DialogTitle"
 import DialogContent from "@material-ui/core/DialogContent"
 import DialogActions from "@material-ui/core/DialogActions"
@@ -6,7 +6,7 @@ import Dialog from "@material-ui/core/Dialog"
 import Button from "@material-ui/core/Button"
 import { Formik, FieldArray } from "formik"
 import Alert from "@material-ui/lab/Alert"
-import { upsertCard, createDataResource, CardData } from "../utils/firebase"
+import { upsertCard, CardData } from "../utils/firebase"
 import FormControl from "@material-ui/core/FormControl"
 import InputLabel from "@material-ui/core/InputLabel"
 import Select from "@material-ui/core/Select"
@@ -16,6 +16,7 @@ import IconButton from "@material-ui/core/IconButton"
 import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { makeStyles } from "@material-ui/core/styles"
+import DataContext from "./DataContext"
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -41,6 +42,7 @@ function SettingsDialog({
   card: CardData
 }) {
   const classes = useStyles()
+  const { cards } = useContext(DataContext)
   const [showAlert, setShowAlert] = useState(false)
   const handleClose = (accepted: boolean) => {
     setShowAlert(false)
@@ -49,8 +51,8 @@ function SettingsDialog({
   const handleFormSubmit = async (values: CardData, helpers: any) => {
     try {
       setShowAlert(false)
-      // resource.update({ ...card, ...values })
-      // await upsertCard(resource.get(card.title)!)
+      cards.update(values)
+      await upsertCard(cards.get(card.title)!)
       handleClose(true)
     } catch (error) {
       console.error(error)

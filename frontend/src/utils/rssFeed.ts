@@ -1,10 +1,12 @@
 import Parser from "rss-parser"
-import { Feed } from "../utils/feed"
+import { FeedContainer } from "../utils/feed"
 
-const parseUrl = async (url: string): Promise<Feed> => {
+const parseUrl = async (url: string): Promise<FeedContainer> => {
   console.log(`${new Date().toISOString()} Downloading ${url}`)
   const parser = new Parser()
   const feed = await parser.parseURL(`/feed?url=${encodeURIComponent(url)}`)
+
+  console.log(url, feed)
 
   return {
     title: feed.title,
@@ -39,7 +41,7 @@ const parseUrl = async (url: string): Promise<Feed> => {
         return {
           title,
           summary,
-          time: entry.updated,
+          time: entry.pubDate,
           image,
           imageLink,
           link: Array.isArray(entry.link) ? entry.link[0].href : entry.link.href || entry.link
@@ -51,31 +53,35 @@ const parseUrl = async (url: string): Promise<Feed> => {
 // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const createRSSResource = () => {
-  const feeds = new Map<string, Feed | null>()
+  const feeds = new Map<string, FeedContainer | null>()
   return {
-    getFeed: (url: string) => {
-      if (!feeds.has(url)) {
-        throw parseUrl(url).then(
+    getFeeds: (urls: string[]) => {
+      return urls.map(url => {
+        if (!feeds.has(url)) {
+          throw parseUrl(url).then(
+            feed => {
+              feeds.set(url, feed)
+            },
+            (error: any) => {
+              console.error(`Failed to parse feed from url ${url}`, error)
+              feeds.set(url, null)
+            }
+          )
+        }
+        return feeds.get(url)
+      })
+    },
+    invalidate: (urls: string[]) => urls.forEach(url => feeds.delete(url)),
+    update: async (urls: string[]) =>
+      urls.forEach(url => {
+        parseUrl(url).then(
           feed => {
             feeds.set(url, feed)
           },
           (error: any) => {
             console.error(`Failed to parse feed from url ${url}`, error)
-            feeds.set(url, null)
           }
         )
-      }
-      return feeds.get(url)
-    },
-    invalidate: (url: string) => feeds.delete(url),
-    update: async (url: string) =>
-      parseUrl(url).then(
-        feed => {
-          feeds.set(url, feed)
-        },
-        (error: any) => {
-          console.error(`Failed to parse feed from url ${url}`, error)
-        }
-      )
+      })
   }
 }

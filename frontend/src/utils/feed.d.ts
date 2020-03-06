@@ -1,4 +1,4 @@
-export interface Feed {
+export interface FeedContainer {
   title?: string
   date: string
   entries: FeedEntry[]

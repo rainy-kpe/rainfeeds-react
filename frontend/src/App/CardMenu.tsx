@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { CardData } from "../utils/firebase"
+import React, { useState, useContext } from "react"
+import { deleteCard, CardData } from "../utils/firebase"
 import Menu from "@material-ui/core/Menu"
 import MenuItem from "@material-ui/core/MenuItem"
 import IconButton from "@material-ui/core/IconButton"
@@ -7,8 +7,10 @@ import MenuIcon from "@material-ui/icons/Menu"
 import Divider from "@material-ui/core/Divider"
 import ConfirmationDialog from "./ConfirmationDialog"
 import SettingsDialog from "./SettingsDialog"
+import DataContext from "./DataContext"
 
-function CardMenu({ card, removeCard }: { card: CardData; removeCard: (card: CardData) => Promise<void> }) {
+function CardMenu({ card, forceUpdate }: { card: CardData; forceUpdate: () => void }) {
+  const data = useContext(DataContext)
   const [anchor, setAnchor] = useState<Element | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -21,15 +23,20 @@ function CardMenu({ card, removeCard }: { card: CardData; removeCard: (card: Car
     setAnchor(null)
   }
 
-  const handleDeleteCard = (confirmed: boolean) => {
+  const handleDeleteCard = async (confirmed: boolean) => {
     setDeleteOpen(false)
     if (confirmed) {
-      removeCard(card)
+      await deleteCard(card.title)
+      data.cards.remove(card.title)
+      forceUpdate()
     }
   }
 
   const handleSettings = (confirmed: boolean) => {
     setSettingsOpen(false)
+    if (confirmed) {
+      forceUpdate()
+    }
   }
 
   return (

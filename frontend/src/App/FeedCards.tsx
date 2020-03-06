@@ -1,12 +1,10 @@
-import React, { useReducer, useState } from "react"
-import { createDataResource, deleteCard, CardData } from "../utils/firebase"
+import React, { useReducer, useState, useContext } from "react"
 import FeedCard from "./FeedCard"
 import AddCardDialog from "./AddCardDialog"
 import { makeStyles } from "@material-ui/core/styles"
 import AddIcon from "@material-ui/icons/Add"
 import Fab from "@material-ui/core/Fab"
-
-const dataResource = createDataResource()
+import DataContext from "./DataContext"
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -23,15 +21,10 @@ const useStyles = makeStyles(theme => ({
 
 function FeedCards() {
   const classes = useStyles()
-  const cards = dataResource.getCards()
+  const data = useContext(DataContext)
+  const cards = data.cards.getCards()
   const [, forceUpdate] = useReducer(x => x + 1, 0)
   const [addCardOpen, setAddCardOpen] = useState(false)
-
-  const removeCard = async (card: CardData) => {
-    await deleteCard(card.title)
-    dataResource.remove(card.title)
-    forceUpdate()
-  }
 
   const handleAddCardClose = (accepted: boolean) => {
     setAddCardOpen(false)
@@ -46,14 +39,13 @@ function FeedCards() {
         ? null
         : cards == null
         ? "Reading cards failed"
-        : cards.map((card, index) => <FeedCard key={index} card={card} removeCard={removeCard} />)}
+        : cards.map((card, index) => <FeedCard key={index} card={card} forceUpdate={forceUpdate} />)}
       <Fab className={classes.fab} color="primary" aria-label="add" onClick={() => setAddCardOpen(true)}>
         <AddIcon />
       </Fab>
       <AddCardDialog
         open={addCardOpen}
         onClose={handleAddCardClose}
-        resource={dataResource}
         allCardTitles={cards?.map(card => card.title.toLowerCase()) || []}
       />
     </div>

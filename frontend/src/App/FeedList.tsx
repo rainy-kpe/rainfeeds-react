@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react"
-import { createRSSResource } from "../utils/rssFeed"
-import { createHNResource } from "../utils/hnFeed"
+import React, { useState, useEffect, useContext } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Alert from "@material-ui/lab/Alert"
 import Button from "@material-ui/core/Button"
@@ -8,10 +6,9 @@ import Entry from "./Entry"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import ListItem from "@material-ui/core/ListItem"
 import Measure from "react-measure"
-import { Feed, FeedEntry } from "../utils/feed"
-
-const rssResource = createRSSResource()
-const hnResource = createHNResource()
+import { FeedContainer, FeedEntry } from "../utils/feed"
+import DataContext from "./DataContext"
+import { CardData } from "../utils/firebase"
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -25,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const mergeFeedEntries = (feeds: Feed[]) => {
+const mergeFeedEntries = (feeds: FeedContainer[]) => {
   const entries = ([] as FeedEntry[]).concat.apply(
     [],
     feeds.map(feed => feed.entries)
@@ -51,43 +48,30 @@ function renderRow(props: ListChildComponentProps) {
   )
 }
 
-function RssFeed({
-  urls,
-  setDate,
-  type,
-  updateRate
-}: {
-  urls: string[]
-  setDate: (date: string) => void
-  type: "rss" | "hackernews"
-  updateRate: number
-}) {
+function FeedList({ card, setDate }: { card: CardData; setDate: (date: string) => void }) {
+  const { type, updateRate, urls } = card
+  const { rss, hackernews } = useContext(DataContext)
   const classes = useStyles()
   const [lastUpdate, setLastUpdate] = useState(new Date())
-  const feeds = type === "rss" ? urls.map(url => rssResource.getFeed(url)) : [hnResource.getFeed()]
+  const resource = type === "rss" ? rss : hackernews
+  const feeds = resource.getFeeds(urls || [])
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (type !== "rss") {
-        await hnResource.update()
-      } else {
-        for (const url of urls) {
-          await rssResource.update(url)
-        }
-      }
+      resource.update(urls || [])
       setLastUpdate(new Date())
     }, (updateRate || 60) * 60 * 1000)
     return () => {
       clearInterval(interval)
     }
-  }, [updateRate, urls, type])
+  }, [updateRate, urls, resource])
 
   useEffect(() => {
     const handleFocusChange = () => {
       const nextUpdate = new Date(lastUpdate.getTime() + (updateRate || 60) * 60000)
       console.log("Focused", nextUpdate)
       if (new Date().getTime() > nextUpdate.getTime()) {
-        type === "rss" ? urls.map(url => rssResource.invalidate(url)) : hnResource.invalidate()
+        resource.invalidate(urls || [])
         setLastUpdate(new Date())
       }
     }
@@ -96,10 +80,10 @@ function RssFeed({
     return () => {
       window.removeEventListener("focus", handleFocusChange)
     }
-  }, [updateRate, lastUpdate])
+  }, [updateRate, lastUpdate, urls, resource])
 
   const fails = feeds.filter(feed => !feed)
-  const succeeded = feeds.filter(feed => !!feed) as Feed[]
+  const succeeded = feeds.filter(feed => !!feed) as FeedContainer[]
   const entries = mergeFeedEntries(succeeded)
 
   const date = succeeded
@@ -114,7 +98,7 @@ function RssFeed({
   }
 
   const handleRetry = () => {
-    urls.forEach(url => rssResource.invalidate(url))
+    resource.invalidate(urls || [])
     setLastUpdate(new Date())
   }
 
@@ -152,4 +136,4 @@ function RssFeed({
   )
 }
 
-export default RssFeed
+export default FeedList

@@ -1,4 +1,4 @@
-import { Feed, FeedEntry } from "../utils/feed"
+import { FeedContainer, FeedEntry } from "../utils/feed"
 
 // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -42,9 +42,9 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
 }
 
 export const createHNResource = () => {
-  let feed: Feed | null | undefined = undefined
+  let feed: FeedContainer | null | undefined = undefined
   return {
-    getFeed: () => {
+    getFeeds: () => {
       if (feed === undefined) {
         throw fetchFeed([]).then(
           result => {
@@ -56,7 +56,7 @@ export const createHNResource = () => {
           }
         )
       }
-      return feed
+      return [feed]
     },
     invalidate: () => (feed = undefined),
     update: async () =>
