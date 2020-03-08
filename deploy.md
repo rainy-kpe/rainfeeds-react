@@ -28,7 +28,7 @@ scp backend/dist/* rainfeeds@rainclip:~/backend/dist/
 ## Deploy Frontend
 
 ```
-scp frontend/dist/* rainfeeds@rainclip:~/frontend/dist/
+scp -r frontend/build/* rainfeeds@rainclip:~/frontend/dist/
 ```
 
 ## Start the Server

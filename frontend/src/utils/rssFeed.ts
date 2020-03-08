@@ -6,7 +6,7 @@ const parseUrl = async (url: string): Promise<FeedContainer> => {
   const parser = new Parser()
   const feed = await parser.parseURL(`/feed?url=${encodeURIComponent(url)}`)
 
-  console.log(url, feed)
+  // console.log(url, feed)
 
   return {
     title: feed.title,

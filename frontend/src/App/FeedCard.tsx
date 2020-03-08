@@ -15,7 +15,10 @@ const useStyles = makeStyles(theme => ({
     flex: "1 0 25rem",
     boxSizing: "border-box",
     margin: "1rem",
-    maxWidth: "calc(33.33333% - 2em)"
+    maxWidth: "calc(33.33333% - 2em)",
+    [theme.breakpoints.down("md")]: {
+      maxWidth: "calc(50% - 2em)"
+    }
   },
   grid: {
     display: "flex",
