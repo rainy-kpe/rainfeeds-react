@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react"
-import { deleteCard, CardData } from "../utils/firebase"
+import React, { useState } from "react"
+import { CardData } from "../utils/firebase"
 import Menu from "@material-ui/core/Menu"
 import MenuItem from "@material-ui/core/MenuItem"
 import IconButton from "@material-ui/core/IconButton"
@@ -7,10 +7,16 @@ import MenuIcon from "@material-ui/icons/Menu"
 import Divider from "@material-ui/core/Divider"
 import ConfirmationDialog from "./ConfirmationDialog"
 import SettingsDialog from "./SettingsDialog"
-import DataContext from "./DataContext"
 
-function CardMenu({ card, forceUpdate }: { card: CardData; forceUpdate: () => void }) {
-  const data = useContext(DataContext)
+function CardMenu({
+  card,
+  updateCard,
+  removeCard
+}: {
+  card: CardData
+  updateCard: (updated: CardData) => Promise<void>
+  removeCard: (removed: CardData) => Promise<void>
+}) {
   const [anchor, setAnchor] = useState<Element | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -26,17 +32,17 @@ function CardMenu({ card, forceUpdate }: { card: CardData; forceUpdate: () => vo
   const handleDeleteCard = async (confirmed: boolean) => {
     setDeleteOpen(false)
     if (confirmed) {
-      await deleteCard(card.title)
-      data.cards.remove(card.title)
-      forceUpdate()
+      try {
+        await removeCard(card)
+      } catch (error) {
+        console.error(error)
+        // TODO: Add <Alert> to show the error to user
+      }
     }
   }
 
-  const handleSettings = (confirmed: boolean) => {
+  const handleSettings = async () => {
     setSettingsOpen(false)
-    if (confirmed) {
-      forceUpdate()
-    }
   }
 
   return (
@@ -66,7 +72,7 @@ function CardMenu({ card, forceUpdate }: { card: CardData; forceUpdate: () => vo
       <ConfirmationDialog title={`Delete '${card.title}'?`} open={deleteOpen} onClose={handleDeleteCard}>
         Do you really want to delete this card? The content will be permanently gone.
       </ConfirmationDialog>
-      <SettingsDialog open={settingsOpen} onClose={handleSettings} card={card} />
+      <SettingsDialog open={settingsOpen} card={card} onClose={handleSettings} updateCard={updateCard} />
     </div>
   )
 }

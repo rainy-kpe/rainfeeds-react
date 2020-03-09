@@ -53,7 +53,7 @@ export const createCardResource = () => {
       if (cards === undefined && user) {
         throw firebase
           .database()
-          .ref(`cards/${user!.uid}`)
+          .ref(`cards/${user.uid}`)
           .once("value")
           .then(
             data => {
@@ -64,23 +64,9 @@ export const createCardResource = () => {
               cards = null
             }
           )
+          .finally(() => cards)
       }
       return cards
-    },
-    invalidate: () => {
-      cards = undefined
-    },
-    remove: (title: string) => {
-      cards = cards?.filter(card => card.title !== title)
-    },
-    add: (title: string) => {
-      cards?.push({ title: title, type: "rss", order: cards.length + 1, updateRate: 60 })
-    },
-    get: (title: string) => {
-      return cards?.find(card => card.title === title)
-    },
-    update: (updated: CardData) => {
-      cards = [...cards!.filter(card => card.title !== updated.title), updated]
     }
   }
 }
@@ -92,16 +78,12 @@ export const login = async () => {
 
 export const logout = () => firebase.auth().signOut()
 
-export const deleteCard = async (title: string) => {
-  try {
-    const userId = firebase.auth().currentUser!.uid
-    await firebase
-      .database()
-      .ref(`cards/${userId}/${title}`)
-      .remove()
-  } catch (error) {
-    console.log(error)
-  }
+export const deleteCard = async (card: CardData) => {
+  const userId = firebase.auth().currentUser!.uid
+  await firebase
+    .database()
+    .ref(`cards/${userId}/${card.title}`)
+    .remove()
 }
 
 export const upsertCard = async (card: CardData) => {

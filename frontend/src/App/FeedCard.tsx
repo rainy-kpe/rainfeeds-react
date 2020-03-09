@@ -9,6 +9,7 @@ import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
 import CardMenu from "./CardMenu"
+import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -16,12 +17,12 @@ const useStyles = makeStyles(theme => ({
     flex: "1 0 25rem",
     boxSizing: "border-box",
     margin: "1rem",
-    maxWidth: "calc(33.33333% - 2em)",
+    maxWidth: "calc(33.33333% - 2rem)",
     [theme.breakpoints.down("md")]: {
-      maxWidth: "calc(50% - 2em)"
+      maxWidth: "calc(50% - 2rem)"
     },
     [theme.breakpoints.down("sm")]: {
-      maxWidth: "calc(100% - 2em)"
+      maxWidth: "calc(100% - 2rem)"
     }
   },
   grid: {
@@ -48,17 +49,34 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-function FeedCard({ card, forceUpdate }: { card: CardData; forceUpdate: () => void }) {
+function FeedCard({
+  card,
+  updateCard,
+  removeCard
+}: {
+  card: CardData
+  updateCard: (updated: CardData) => Promise<void>
+  removeCard: (removed: CardData) => Promise<void>
+}) {
   const classes = useStyles()
   const [date, setDate] = useState("")
+  const [url, setUrl] = useState("")
   return (
     <Card className={classes.card}>
       <CardContent className={classes.content}>
         <div className={classes.title}>
-          <Typography variant="h6">{card.title}</Typography>
+          <Typography variant="h6">
+            {url ? (
+              <Link href={url} target="_blank">
+                {card.title}
+              </Link>
+            ) : (
+              card.title
+            )}
+          </Typography>
           <span className={classes.date}>{date && <TimeAgo date={date} />}</span>
           <span className={classes.menu}>
-            <CardMenu card={card} forceUpdate={forceUpdate} />
+            <CardMenu card={card} updateCard={updateCard} removeCard={removeCard} />
           </span>
         </div>
         <Suspense
@@ -68,7 +86,7 @@ function FeedCard({ card, forceUpdate }: { card: CardData; forceUpdate: () => vo
             </Grid>
           }
         >
-          <FeedList card={card} setDate={setDate} />
+          <FeedList card={card} setDate={setDate} setUrl={setUrl} />
         </Suspense>
       </CardContent>
     </Card>

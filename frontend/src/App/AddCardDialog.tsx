@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"
+import React, { useState } from "react"
 import DialogTitle from "@material-ui/core/DialogTitle"
 import DialogContent from "@material-ui/core/DialogContent"
 import DialogActions from "@material-ui/core/DialogActions"
@@ -7,8 +7,7 @@ import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import { Formik, FormikErrors } from "formik"
 import Alert from "@material-ui/lab/Alert"
-import { upsertCard } from "../utils/firebase"
-import DataContext from "./DataContext"
+import { CardData } from "../utils/firebase"
 
 interface FormValues {
   title: string
@@ -17,25 +16,27 @@ interface FormValues {
 function AddCardDialog({
   open,
   onClose,
+  addCard,
   allCardTitles
 }: {
   open: boolean
-  onClose: (accepted: boolean) => void
+  onClose: () => void
+  addCard: (added: CardData) => Promise<void>
   allCardTitles: string[]
 }) {
   const initialValues: FormValues = { title: "" }
-  const { cards } = useContext(DataContext)
   const [showAlert, setShowAlert] = useState(false)
-  const handleClose = (accepted: boolean) => {
+
+  const handleClose = () => {
     setShowAlert(false)
-    onClose(accepted)
+    onClose()
   }
+
   const handleFormSubmit = async (values: FormValues, helpers: any) => {
     try {
       setShowAlert(false)
-      cards.add(values.title)
-      await upsertCard(cards.get(values.title)!)
-      handleClose(true)
+      await addCard({ type: "rss", order: allCardTitles.length + 1, title: values.title, updateRate: 60 })
+      handleClose()
     } catch (error) {
       console.error(error)
       setShowAlert(true)
@@ -80,7 +81,7 @@ function AddCardDialog({
               {showAlert && <Alert severity="error">Failed to add the card</Alert>}
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => handleClose(false)} color="primary">
+              <Button onClick={handleClose} color="primary">
                 Cancel
               </Button>
               <Button type="submit" color="primary" disabled={isSubmitting || !!errors.title || !touched.title}>

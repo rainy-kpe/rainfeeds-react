@@ -1,5 +1,6 @@
 export interface FeedContainer {
   title?: string
+  link?: string
   date: string
   entries: FeedEntry[]
 }
@@ -12,4 +13,5 @@ export interface FeedEntry {
   image?: string
   imageLink?: string
   id?: string
+  origin?: string
 }
