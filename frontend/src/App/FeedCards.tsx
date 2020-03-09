@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import AddIcon from "@material-ui/icons/Add"
 import Fab from "@material-ui/core/Fab"
 import DataContext from "./DataContext"
+import { CardData } from "../utils/firebase"
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -22,9 +23,30 @@ const useStyles = makeStyles(theme => ({
 function FeedCards() {
   const classes = useStyles()
   const data = useContext(DataContext)
-  const cards = data.cards.getCards()
+  const [cards, setCards] = useState<CardData[] | null | undefined>()
+  //  const cards = data.cards.getCards()
   const [, forceUpdate] = useReducer(x => x + 1, 0)
   const [addCardOpen, setAddCardOpen] = useState(false)
+
+  if (cards === undefined) {
+    setCards(data.cards.getCards())
+  }
+
+  const removeCard = (removed: CardData) => {
+    if (Array.isArray(cards)) {
+      setCards(cards.filter(card => card.title !== removed.title))
+    }
+  }
+  const addCard = (added: CardData) => {
+    if (Array.isArray(cards)) {
+      setCards([...cards, added])
+    }
+  }
+  const updateCard = (updated: CardData) => {
+    if (Array.isArray(cards)) {
+      setCards([...cards!.filter(card => card.title !== updated.title), updated].sort((a, b) => a.order - b.order))
+    }
+  }
 
   const handleAddCardClose = (accepted: boolean) => {
     setAddCardOpen(false)
