@@ -12,12 +12,16 @@ import CardMenu from "./CardMenu"
 
 const useStyles = makeStyles(theme => ({
   card: {
+    fontSize: "90%",
     flex: "1 0 25rem",
     boxSizing: "border-box",
     margin: "1rem",
     maxWidth: "calc(33.33333% - 2em)",
     [theme.breakpoints.down("md")]: {
       maxWidth: "calc(50% - 2em)"
+    },
+    [theme.breakpoints.down("sm")]: {
+      maxWidth: "calc(100% - 2em)"
     }
   },
   grid: {
