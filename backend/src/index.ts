@@ -3,6 +3,7 @@ import * as path from "path"
 import axios from "axios"
 import { exec } from "child_process"
 import { encode, decode } from "iconv-lite"
+import * as helmet from "helmet"
 
 interface ICachedFeed {
   time: number
@@ -11,7 +12,7 @@ interface ICachedFeed {
 
 const app = express()
 const port = 9000
-const distPath = path.resolve("../frontend/dist")
+const distPath = path.resolve("../frontend/build")
 const cache: { [url: string]: ICachedFeed } = {}
 
 const addToCache = (url: string, data: string) => {
@@ -21,6 +22,26 @@ const addToCache = (url: string, data: string) => {
   }
 }
 
+app.use(helmet())
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "*.googleapis.com",
+        "*.google.com",
+        "*.firebaseapp.com",
+        "*.firebaseio.com"
+      ],
+      frameSrc: ["'self'", "*.firebaseapp.com", "*.firebaseio.com"],
+      connectSrc: ["'self'", "*.googleapis.com", "*.firebaseio.com", "wss://*.firebaseio.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["*"]
+    }
+  })
+)
 app.get("/", (req, res) => res.sendFile(path.join(distPath, "index.html")))
 app.get("/feed", async (req, res) => {
   const decoded = decodeURIComponent(req.query.url)
