@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react"
+import React, { Suspense, useState, useRef } from "react"
 import { CardData } from "../utils/firebase"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
@@ -9,6 +9,7 @@ import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
 import CardMenu from "./CardMenu"
+import { useDrag, useDrop } from "react-dnd"
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -49,10 +50,29 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function FeedCard({ card, forceUpdate }: { card: CardData; forceUpdate: () => void }) {
+  const ref = useRef(null)
   const classes = useStyles()
   const [date, setDate] = useState("")
+
+  const [, connectDrag] = useDrag({
+    item: { title: card.title, type: "CARD" }
+  })
+
+  const [, connectDrop] = useDrop({
+    accept: "CARD",
+    hover(hoveredOverItem: any) {
+      if (hoveredOverItem.title === card.title) {
+        return
+      }
+      console.log("Hovering", hoveredOverItem, card.title)
+    }
+  })
+
+  connectDrag(ref)
+  connectDrop(ref)
+
   return (
-    <Card className={classes.card}>
+    <Card ref={ref} className={classes.card}>
       <CardContent className={classes.content}>
         <div className={classes.title}>
           <Typography variant="h6">{card.title}</Typography>
