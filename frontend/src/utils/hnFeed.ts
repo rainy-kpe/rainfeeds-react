@@ -36,6 +36,7 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
 
   return {
     title: "HackerNews",
+    link: "https://hckrnews.com/",
     date: new Date().toISOString(),
     entries: entries.slice(0, 30)
   }

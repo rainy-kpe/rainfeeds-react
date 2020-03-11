@@ -16,7 +16,7 @@ chown -R rainfeeds.rainfeeds /home/rainfeeds/.ssh/
 sudo su rainfeeds
 cd ~
 mkdir -p backend/dist
-mkdir -p frontend/dist
+mkdir -p frontend/build
 ```
 
 ## Deploy Backend
@@ -28,7 +28,7 @@ scp backend/dist/* rainfeeds@rainclip:~/backend/dist/
 ## Deploy Frontend
 
 ```
-scp -r frontend/build/* rainfeeds@rainclip:~/frontend/dist/
+scp -r frontend/build/* rainfeeds@rainclip:~/frontend/build/
 ```
 
 ## Start the Server

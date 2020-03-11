@@ -11,6 +11,7 @@ const parseUrl = async (url: string): Promise<FeedContainer> => {
   return {
     title: feed.title,
     date: feed.lastBuildDate,
+    link: feed.link,
     entries:
       feed.items?.map((entry: any) => {
         let image
@@ -44,7 +45,7 @@ const parseUrl = async (url: string): Promise<FeedContainer> => {
           time: entry.pubDate,
           image,
           imageLink,
-          link: Array.isArray(entry.link) ? entry.link[0].href : entry.link.href || entry.link
+          link: Array.isArray(entry.link) && entry.link.length > 0 ? entry.link[0].href : entry.link?.href || entry.link
         }
       }) || []
   }

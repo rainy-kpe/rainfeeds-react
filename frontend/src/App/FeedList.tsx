@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Alert from "@material-ui/lab/Alert"
 import Button from "@material-ui/core/Button"
@@ -7,8 +7,9 @@ import { FixedSizeList, ListChildComponentProps } from "react-window"
 import ListItem from "@material-ui/core/ListItem"
 import Measure from "react-measure"
 import { FeedContainer, FeedEntry } from "../utils/feed"
-import DataContext from "./DataContext"
 import { CardData } from "../utils/firebase"
+import { createRSSResource } from "../utils/rssFeed"
+import { createHNResource } from "../utils/hnFeed"
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -22,10 +23,13 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
+const rss = createRSSResource()
+const hackernews = createHNResource()
+
 const mergeFeedEntries = (feeds: FeedContainer[]) => {
   const entries = ([] as FeedEntry[]).concat.apply(
     [],
-    feeds.map(feed => feed.entries)
+    feeds.map(feed => feed.entries.map(entry => (feeds.length > 1 ? { ...entry, origin: feed.title } : entry)))
   )
   if (entries.length > 0) {
     entries.sort((a: FeedEntry, b: FeedEntry) => {
@@ -48,9 +52,16 @@ function renderRow(props: ListChildComponentProps) {
   )
 }
 
-function FeedList({ card, setDate }: { card: CardData; setDate: (date: string) => void }) {
+function FeedList({
+  card,
+  setDate,
+  setUrl
+}: {
+  card: CardData
+  setDate: (date: string) => void
+  setUrl: (url: string) => void
+}) {
   const { type, updateRate, urls } = card
-  const { rss, hackernews } = useContext(DataContext)
   const classes = useStyles()
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const resource = type === "rss" ? rss : hackernews
@@ -93,9 +104,17 @@ function FeedList({ card, setDate }: { card: CardData; setDate: (date: string) =
       return acc === null || current! < acc ? current : acc
     }, null)
 
-  if (date) {
-    setDate(date.toISOString())
-  }
+  useEffect(() => {
+    if (date) {
+      setDate(date.toISOString())
+    }
+  }, [setDate, date])
+
+  useEffect(() => {
+    if (feeds?.length === 1) {
+      setUrl(feeds[0]?.link || "")
+    }
+  }, [setUrl, feeds])
 
   const handleRetry = () => {
     resource.invalidate(urls || [])

@@ -12,6 +12,11 @@ const useStyles = makeStyles(theme => ({
   title: {
     fontWeight: 600
   },
+  origin: {
+    fontSize: "60%",
+    color: "#BBB",
+    marginLeft: "8px"
+  },
   summary: {
     fontSize: "80%",
     color: "#888"
@@ -51,6 +56,7 @@ function Entry({ entry, index }: { entry: FeedEntry; index: number }) {
         />
       )}
       <span className={classes.title}>{entry.title}</span>
+      <span className={classes.origin}>{entry.origin}</span>
       <br />
       <span className={classes.summary}>{entry.summary}</span>
     </div>

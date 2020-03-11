@@ -1,17 +1,17 @@
-import React, { useReducer, useState, useContext } from "react"
+import React, { useState } from "react"
 import FeedCard from "./FeedCard"
 import AddCardDialog from "./AddCardDialog"
 import { makeStyles } from "@material-ui/core/styles"
 import AddIcon from "@material-ui/icons/Add"
 import Fab from "@material-ui/core/Fab"
-import DataContext from "./DataContext"
-import { CardData } from "../utils/firebase"
+import { createCardResource, CardData, deleteCard, upsertCard } from "../utils/firebase"
+
+const cardsResource = createCardResource()
 
 const useStyles = makeStyles(theme => ({
   container: {
     display: "flex",
-    flexWrap: "wrap",
-    margin: "0 2rem"
+    flexWrap: "wrap"
   },
   fab: {
     position: "fixed",
@@ -22,37 +22,34 @@ const useStyles = makeStyles(theme => ({
 
 function FeedCards() {
   const classes = useStyles()
-  const data = useContext(DataContext)
   const [cards, setCards] = useState<CardData[] | null | undefined>()
-  //  const cards = data.cards.getCards()
-  const [, forceUpdate] = useReducer(x => x + 1, 0)
   const [addCardOpen, setAddCardOpen] = useState(false)
 
   if (cards === undefined) {
-    setCards(data.cards.getCards())
+    setCards(cardsResource.getCards())
   }
 
-  const removeCard = (removed: CardData) => {
+  const removeCard = async (removed: CardData) => {
     if (Array.isArray(cards)) {
+      await deleteCard(removed)
       setCards(cards.filter(card => card.title !== removed.title))
     }
   }
-  const addCard = (added: CardData) => {
+  const addCard = async (added: CardData) => {
     if (Array.isArray(cards)) {
+      await upsertCard(added)
       setCards([...cards, added])
     }
   }
-  const updateCard = (updated: CardData) => {
+  const updateCard = async (updated: CardData) => {
     if (Array.isArray(cards)) {
+      await upsertCard(updated)
       setCards([...cards!.filter(card => card.title !== updated.title), updated].sort((a, b) => a.order - b.order))
     }
   }
 
-  const handleAddCardClose = (accepted: boolean) => {
+  const handleAddCardClose = () => {
     setAddCardOpen(false)
-    if (accepted) {
-      forceUpdate()
-    }
   }
 
   return (
@@ -61,13 +58,16 @@ function FeedCards() {
         ? null
         : cards == null
         ? "Reading cards failed"
-        : cards.map((card, index) => <FeedCard key={index} card={card} forceUpdate={forceUpdate} />)}
+        : cards.map((card, index) => (
+            <FeedCard key={index} card={card} updateCard={updateCard} removeCard={removeCard} />
+          ))}
       <Fab className={classes.fab} color="primary" aria-label="add" onClick={() => setAddCardOpen(true)}>
         <AddIcon />
       </Fab>
       <AddCardDialog
         open={addCardOpen}
         onClose={handleAddCardClose}
+        addCard={addCard}
         allCardTitles={cards?.map(card => card.title.toLowerCase()) || []}
       />
     </div>
