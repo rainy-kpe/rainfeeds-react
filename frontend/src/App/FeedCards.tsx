@@ -48,6 +48,21 @@ function FeedCards() {
     }
   }
 
+  const moveCard = async (fromTitle: string, toTitle: string) => {
+    if (!!cards) {
+      const fromIndex = cards.findIndex(card => card.title === fromTitle)
+      const [fromCard] = cards.splice(fromIndex!, 1) || []
+      const toIndex = cards.findIndex(card => card.title === toTitle)
+      cards.splice(toIndex + (fromIndex <= toIndex ? 1 : 0), 0, fromCard!)
+      const updatedCards = cards.map((card, index) => ({ ...card, order: index + 1 }))
+      setCards(updatedCards)
+
+      // TODO: Error handling
+      const promises = updatedCards.map(upsertCard)
+      await Promise.all(promises)
+    }
+  }
+
   const handleAddCardClose = () => {
     setAddCardOpen(false)
   }
@@ -59,7 +74,7 @@ function FeedCards() {
         : cards == null
         ? "Reading cards failed"
         : cards.map((card, index) => (
-            <FeedCard key={index} card={card} updateCard={updateCard} removeCard={removeCard} />
+            <FeedCard key={index} card={card} updateCard={updateCard} removeCard={removeCard} moveCard={moveCard} />
           ))}
       <Fab className={classes.fab} color="primary" aria-label="add" onClick={() => setAddCardOpen(true)}>
         <AddIcon />

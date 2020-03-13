@@ -80,7 +80,6 @@ function FeedList({
   useEffect(() => {
     const handleFocusChange = () => {
       const nextUpdate = new Date(lastUpdate.getTime() + (updateRate || 60) * 60000)
-      console.log("Focused", nextUpdate)
       if (new Date().getTime() > nextUpdate.getTime()) {
         resource.invalidate(urls || [])
         setLastUpdate(new Date())

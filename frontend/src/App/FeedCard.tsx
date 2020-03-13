@@ -34,6 +34,10 @@ const useStyles = makeStyles(theme => ({
   content: {
     padding: "0 !important"
   },
+  contentOver: {
+    padding: "0 !important",
+    border: "2px dashed"
+  },
   title: {
     padding: "0 16px",
     background: "#eeeeee",
@@ -53,11 +57,13 @@ const useStyles = makeStyles(theme => ({
 function FeedCard({
   card,
   updateCard,
-  removeCard
+  removeCard,
+  moveCard
 }: {
   card: CardData
   updateCard: (updated: CardData) => Promise<void>
   removeCard: (removed: CardData) => Promise<void>
+  moveCard: (fromTitle: string, toTitle: string) => void
 }) {
   const classes = useStyles()
   const [date, setDate] = useState("")
@@ -68,13 +74,18 @@ function FeedCard({
     item: { title: card.title, type: "CARD" }
   })
 
-  const [, connectDrop] = useDrop({
+  const [{ isOver }, connectDrop] = useDrop({
     accept: "CARD",
-    hover(hoveredOverItem: any) {
-      if (hoveredOverItem.title === card.title) {
+    drop(item: any) {
+      if (item.title === card.title) {
         return
       }
-      console.log("Hovering", hoveredOverItem, card.title)
+      moveCard(item.title, card.title)
+    },
+    collect: monitor => {
+      return {
+        isOver: monitor.isOver()
+      }
     }
   })
 
@@ -83,7 +94,7 @@ function FeedCard({
 
   return (
     <Card ref={ref} className={classes.card}>
-      <CardContent className={classes.content}>
+      <CardContent className={isOver ? classes.contentOver : classes.content}>
         <div className={classes.title}>
           <Typography variant="h6">
             {url ? (
