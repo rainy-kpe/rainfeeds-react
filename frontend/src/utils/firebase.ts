@@ -5,7 +5,7 @@ import "firebase/database"
 // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export interface CardData {
-  type: "rss" | "hackernews"
+  type: "rss" | "hackernews" | "graph"
   order: number
   title: string
   urls?: string[]

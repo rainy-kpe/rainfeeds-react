@@ -1,35 +1,15 @@
-import React, { useState, useEffect } from "react"
-import { makeStyles } from "@material-ui/core/styles"
-import Alert from "@material-ui/lab/Alert"
-import Button from "@material-ui/core/Button"
+import React, { useEffect } from "react"
 import Entry from "./Entry"
 import { FixedSizeList, ListChildComponentProps } from "react-window"
 import ListItem from "@material-ui/core/ListItem"
 import Measure from "react-measure"
-import { FeedContainer, FeedEntry } from "../utils/feed"
+import { FeedContainer, FeedEntry, FeedResource } from "../utils/feed"
 import { CardData } from "../utils/firebase"
-import { createRSSResource } from "../utils/rssFeed"
-import { createHNResource } from "../utils/hnFeed"
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis"
-  },
-  feed: {},
-  alert: {
-    margin: "1rem"
-  }
-}))
-
-const rss = createRSSResource()
-const hackernews = createHNResource()
 
 const mergeFeedEntries = (feeds: FeedContainer[]) => {
   const entries = ([] as FeedEntry[]).concat.apply(
     [],
-    feeds.map(feed => feed.entries.map(entry => (feeds.length > 1 ? { ...entry, origin: feed.title } : entry)))
+    feeds.map((feed) => feed.entries.map((entry) => (feeds.length > 1 ? { ...entry, origin: feed.title } : entry)))
   )
   if (entries.length > 0) {
     entries.sort((a: FeedEntry, b: FeedEntry) => {
@@ -53,52 +33,33 @@ function renderRow(props: ListChildComponentProps) {
 }
 
 function FeedList({
+  resource,
   card,
   setDate,
-  setUrl
+  setUrl,
+  setShowAlert,
 }: {
+  resource: FeedResource<FeedContainer>
   card: CardData
   setDate: (date: string) => void
   setUrl: (url: string) => void
+  setShowAlert: (showAlert: boolean) => void
 }) {
-  const { type, updateRate, urls } = card
-  const classes = useStyles()
-  const [lastUpdate, setLastUpdate] = useState(new Date())
-  const resource = type === "rss" ? rss : hackernews
+  const { urls } = card
   const feeds = resource.getFeeds(urls || [])
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      resource.update(urls || [])
-      setLastUpdate(new Date())
-    }, (updateRate || 60) * 60 * 1000)
-    return () => {
-      clearInterval(interval)
-    }
-  }, [updateRate, urls, resource])
-
-  useEffect(() => {
-    const handleFocusChange = () => {
-      const nextUpdate = new Date(lastUpdate.getTime() + (updateRate || 60) * 60000)
-      if (new Date().getTime() > nextUpdate.getTime()) {
-        resource.invalidate(urls || [])
-        setLastUpdate(new Date())
-      }
-    }
-
-    window.addEventListener("focus", handleFocusChange)
-    return () => {
-      window.removeEventListener("focus", handleFocusChange)
-    }
-  }, [updateRate, lastUpdate, urls, resource])
-
-  const fails = feeds.filter(feed => !feed)
-  const succeeded = feeds.filter(feed => !!feed) as FeedContainer[]
+  const fails = feeds.filter((feed) => !feed)
+  const succeeded = feeds.filter((feed) => !!feed) as FeedContainer[]
   const entries = mergeFeedEntries(succeeded)
 
+  useEffect(() => {
+    if (fails.length > 0) {
+      setShowAlert(true)
+    }
+  }, [setShowAlert, fails])
+
   const date = succeeded
-    .map(feed => (feed.date ? new Date(feed.date) : null))
-    .filter(date => !!date)
+    .map((feed) => (feed.date ? new Date(feed.date) : null))
+    .filter((date) => !!date)
     .reduce<Date | null>((acc, current) => {
       return acc === null || current! < acc ? current : acc
     }, null)
@@ -115,42 +76,22 @@ function FeedList({
     }
   }, [setUrl, feeds])
 
-  const handleRetry = () => {
-    resource.invalidate(urls || [])
-    setLastUpdate(new Date())
-  }
-
   return (
-    <div className={classes.feed}>
-      {fails.length > 0 && (
-        <Alert
-          className={classes.alert}
-          severity="error"
-          action={
-            <Button color="inherit" size="small" onClick={handleRetry}>
-              RETRY
-            </Button>
-          }
-        >
-          Failed to read some of the feeds
-        </Alert>
+    <Measure>
+      {({ contentRect, measureRef }) => (
+        <div ref={measureRef}>
+          <FixedSizeList
+            itemData={entries}
+            height={fails.length > 0 ? 350 : 400}
+            width={contentRect.entry.width}
+            itemSize={50}
+            itemCount={entries.length}
+          >
+            {renderRow}
+          </FixedSizeList>
+        </div>
       )}
-      <Measure>
-        {({ contentRect, measureRef }) => (
-          <div ref={measureRef}>
-            <FixedSizeList
-              itemData={entries}
-              height={fails.length > 0 ? 350 : 400}
-              width={contentRect.entry.width}
-              itemSize={50}
-              itemCount={entries.length}
-            >
-              {renderRow}
-            </FixedSizeList>
-          </div>
-        )}
-      </Measure>
-    </div>
+    </Measure>
   )
 }
 

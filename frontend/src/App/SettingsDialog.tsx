@@ -17,25 +17,25 @@ import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { makeStyles } from "@material-ui/core/styles"
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     "& > div": {
-      marginBottom: "20px"
-    }
+      marginBottom: "20px",
+    },
   },
   urlContainer: {
-    display: "flex"
+    display: "flex",
   },
   url: {
-    flex: "1"
-  }
+    flex: "1",
+  },
 }))
 
 function SettingsDialog({
   open,
   card,
   onClose,
-  updateCard
+  updateCard,
 }: {
   open: boolean
   card: CardData
@@ -67,7 +67,7 @@ function SettingsDialog({
 
       <Formik
         initialValues={{ ...card, urls: [...(card.urls || [])] }}
-        validate={values => {
+        validate={(values) => {
           const errors: any = {}
           if (values.updateRate <= 0) {
             errors.updateRate = "Must be greater than 0"
@@ -98,6 +98,7 @@ function SettingsDialog({
                 >
                   <MenuItem value="rss">RSS</MenuItem>
                   <MenuItem value="hackernews">HackerNews</MenuItem>
+                  <MenuItem value="graph">Graph</MenuItem>
                 </Select>
               </FormControl>
               <TextField
@@ -111,12 +112,12 @@ function SettingsDialog({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 InputLabelProps={{
-                  shrink: true
+                  shrink: true,
                 }}
               />
-              {values.type === "rss" && (
+              {(values.type === "rss" || values.type === "graph") && (
                 <FieldArray name="urls">
-                  {arrayHelpers => (
+                  {(arrayHelpers) => (
                     <div>
                       {values.urls.map((url, index) => (
                         <div key={index} className={classes.urlContainer}>

@@ -8,16 +8,16 @@ import { createCardResource, CardData, deleteCard, upsertCard } from "../utils/f
 
 const cardsResource = createCardResource()
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   fab: {
     position: "fixed",
     bottom: theme.spacing(2),
-    right: theme.spacing(2)
-  }
+    right: theme.spacing(2),
+  },
 }))
 
 function FeedCards() {
@@ -32,7 +32,7 @@ function FeedCards() {
   const removeCard = async (removed: CardData) => {
     if (Array.isArray(cards)) {
       await deleteCard(removed)
-      setCards(cards.filter(card => card.title !== removed.title))
+      setCards(cards.filter((card) => card.title !== removed.title))
     }
   }
   const addCard = async (added: CardData) => {
@@ -44,15 +44,15 @@ function FeedCards() {
   const updateCard = async (updated: CardData) => {
     if (Array.isArray(cards)) {
       await upsertCard(updated)
-      setCards([...cards!.filter(card => card.title !== updated.title), updated].sort((a, b) => a.order - b.order))
+      setCards([...cards!.filter((card) => card.title !== updated.title), updated].sort((a, b) => a.order - b.order))
     }
   }
 
   const moveCard = async (fromTitle: string, toTitle: string) => {
     if (!!cards) {
-      const fromIndex = cards.findIndex(card => card.title === fromTitle)
+      const fromIndex = cards.findIndex((card) => card.title === fromTitle)
       const [fromCard] = cards.splice(fromIndex!, 1) || []
-      const toIndex = cards.findIndex(card => card.title === toTitle)
+      const toIndex = cards.findIndex((card) => card.title === toTitle)
       cards.splice(toIndex + (fromIndex <= toIndex ? 1 : 0), 0, fromCard!)
       const updatedCards = cards.map((card, index) => ({ ...card, order: index + 1 }))
       setCards(updatedCards)
@@ -83,7 +83,7 @@ function FeedCards() {
         open={addCardOpen}
         onClose={handleAddCardClose}
         addCard={addCard}
-        allCardTitles={cards?.map(card => card.title.toLowerCase()) || []}
+        allCardTitles={cards?.map((card) => card.title.toLowerCase()) || []}
       />
     </div>
   )

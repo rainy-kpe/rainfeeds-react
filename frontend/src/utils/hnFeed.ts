@@ -1,4 +1,4 @@
-import { FeedContainer, FeedEntry } from "../utils/feed"
+import { FeedContainer, FeedEntry, FeedResource } from "../utils/feed"
 
 // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -8,7 +8,7 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
   const json = await response.json()
 
   // Only download items which are new
-  const oldItems = currentEntries ? currentEntries.map(entry => entry.id) : []
+  const oldItems = currentEntries ? currentEntries.map((entry) => entry.id) : []
 
   const promises = json.splice(0, 30).map(async (id: string) => {
     if (!oldItems.includes(id)) {
@@ -20,7 +20,7 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
 
   const result = await Promise.all(promises)
   const entries = result
-    .filter(entry => !!entry)
+    .filter((entry) => !!entry)
     .filter((entry: any) => entry.score > 50)
     .map((entry: any) => {
       return {
@@ -29,7 +29,7 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
         time: new Date(entry.time * 1000).toISOString(),
         link: `https://news.ycombinator.com/item?id=${entry.id}`,
         summaryLink: `https://news.ycombinator.com/item?id=${entry.id}`,
-        id: entry.id
+        id: entry.id,
       } as FeedEntry
     })
     .concat(currentEntries)
@@ -38,17 +38,17 @@ const fetchFeed = async (currentEntries: FeedEntry[]) => {
     title: "HackerNews",
     link: "https://hckrnews.com/",
     date: new Date().toISOString(),
-    entries: entries.slice(0, 30)
+    entries: entries.slice(0, 30),
   }
 }
 
-export const createHNResource = () => {
+export const createHNResource: () => FeedResource<FeedContainer> = () => {
   let feed: FeedContainer | null | undefined = undefined
   return {
     getFeeds: () => {
       if (feed === undefined) {
         throw fetchFeed([]).then(
-          result => {
+          (result) => {
             feed = result
           },
           (error: any) => {
@@ -62,12 +62,12 @@ export const createHNResource = () => {
     invalidate: () => (feed = undefined),
     update: async () =>
       fetchFeed(feed?.entries || []).then(
-        result => {
+        (result) => {
           feed = result
         },
         (error: any) => {
           console.error(`Failed to parse HackerNews feed`, error)
         }
-      )
+      ),
   }
 }

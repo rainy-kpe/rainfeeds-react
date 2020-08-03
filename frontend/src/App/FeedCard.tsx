@@ -4,7 +4,7 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import Typography from "@material-ui/core/Typography"
 import { makeStyles } from "@material-ui/core/styles"
-import FeedList from "./FeedList"
+import FeedContent from "./FeedContent"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import Grid from "@material-ui/core/Grid"
 import TimeAgo from "react-timeago"
@@ -12,7 +12,7 @@ import CardMenu from "./CardMenu"
 import { useDrag, useDrop } from "react-dnd"
 import Link from "@material-ui/core/Link"
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   card: {
     fontSize: "90%",
     flex: "1 0 25rem",
@@ -20,45 +20,45 @@ const useStyles = makeStyles(theme => ({
     margin: "1rem",
     maxWidth: "calc(33.33333% - 2rem)",
     [theme.breakpoints.down("md")]: {
-      maxWidth: "calc(50% - 2rem)"
+      maxWidth: "calc(50% - 2rem)",
     },
     [theme.breakpoints.down("sm")]: {
-      maxWidth: "calc(100% - 2rem)"
-    }
+      maxWidth: "calc(100% - 2rem)",
+    },
   },
   grid: {
     display: "flex",
     minHeight: "400px",
-    maxHeight: "400px"
+    maxHeight: "400px",
   },
   content: {
-    padding: "0 !important"
+    padding: "0 !important",
   },
   contentOver: {
     padding: "0 !important",
-    border: "2px dashed"
+    border: "2px dashed",
   },
   title: {
     padding: "0 16px",
     background: "#eeeeee",
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
   },
   date: {
     color: "#888888",
     marginLeft: "8px",
-    flex: 1
+    flex: 1,
   },
   menu: {
-    justifySelf: "right"
-  }
+    justifySelf: "right",
+  },
 }))
 
 function FeedCard({
   card,
   updateCard,
   removeCard,
-  moveCard
+  moveCard,
 }: {
   card: CardData
   updateCard: (updated: CardData) => Promise<void>
@@ -71,7 +71,7 @@ function FeedCard({
   const ref = useRef(null)
 
   const [, connectDrag] = useDrag({
-    item: { title: card.title, type: "CARD" }
+    item: { title: card.title, type: "CARD" },
   })
 
   const [{ isOver }, connectDrop] = useDrop({
@@ -82,11 +82,11 @@ function FeedCard({
       }
       moveCard(item.title, card.title)
     },
-    collect: monitor => {
+    collect: (monitor) => {
       return {
-        isOver: monitor.isOver()
+        isOver: monitor.isOver(),
       }
-    }
+    },
   })
 
   connectDrag(ref)
@@ -117,7 +117,7 @@ function FeedCard({
             </Grid>
           }
         >
-          <FeedList card={card} setDate={setDate} setUrl={setUrl} />
+          <FeedContent card={card} setDate={setDate} setUrl={setUrl} />
         </Suspense>
       </CardContent>
     </Card>

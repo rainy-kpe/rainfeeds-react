@@ -15,3 +15,9 @@ export interface FeedEntry {
   id?: string
   origin?: string
 }
+
+export interface FeedResource<T> {
+  getFeeds: (urls: string[]) => (T | null | undefined)[]
+  invalidate: (urls: string[]) => void
+  update: (urls: string[]) => Promise<void>
+}

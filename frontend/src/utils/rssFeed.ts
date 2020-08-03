@@ -1,5 +1,5 @@
 import Parser from "rss-parser"
-import { FeedContainer } from "../utils/feed"
+import { FeedContainer, FeedResource } from "../utils/feed"
 
 const parseUrl = async (url: string): Promise<FeedContainer> => {
   console.log(`${new Date().toISOString()} Downloading ${url}`)
@@ -45,22 +45,23 @@ const parseUrl = async (url: string): Promise<FeedContainer> => {
           time: entry.pubDate,
           image,
           imageLink,
-          link: Array.isArray(entry.link) && entry.link.length > 0 ? entry.link[0].href : entry.link?.href || entry.link
+          link:
+            Array.isArray(entry.link) && entry.link.length > 0 ? entry.link[0].href : entry.link?.href || entry.link,
         }
-      }) || []
+      }) || [],
   }
 }
 
 // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-export const createRSSResource = () => {
-  const feeds = new Map<string, FeedContainer | null>()
+export const createRSSResource: () => FeedResource<FeedContainer> = () => {
+  const feeds = new Map<string, FeedContainer | null | undefined>()
   return {
     getFeeds: (urls: string[]) => {
-      return urls.map(url => {
+      return urls.map((url) => {
         if (!feeds.has(url)) {
           throw parseUrl(url).then(
-            feed => {
+            (feed) => {
               feeds.set(url, feed)
             },
             (error: any) => {
@@ -72,17 +73,17 @@ export const createRSSResource = () => {
         return feeds.get(url)
       })
     },
-    invalidate: (urls: string[]) => urls.forEach(url => feeds.delete(url)),
+    invalidate: (urls: string[]) => urls.forEach((url) => feeds.delete(url)),
     update: async (urls: string[]) =>
-      urls.forEach(url => {
+      urls.forEach((url) => {
         parseUrl(url).then(
-          feed => {
+          (feed) => {
             feeds.set(url, feed)
           },
           (error: any) => {
             console.error(`Failed to parse feed from url ${url}`, error)
           }
         )
-      })
+      }),
   }
 }
