@@ -21,8 +21,12 @@ const parseUrl = async (url: string): Promise<FeedContainer> => {
         if (content) {
           let re = content.match(/img src="(.*?)"/i)
           image = re && re.length > 1 ? re[1] : undefined
-          if (image && image.includes("feeds.feedburner.com")) {
-            image = undefined
+          if (image) {
+            if (image.includes("feeds.feedburner.com")) {
+              image = undefined
+            } else {
+              image = image.replace(/&amp;/g, "&")
+            }
           }
 
           re = content.match(/.*href="(.*?)">\[link/i)
